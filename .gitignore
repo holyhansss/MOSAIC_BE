@@ -1,0 +1,8 @@
+.env
+
+# testing
+/coverage
+
+# production
+/build
+package-lock.json
