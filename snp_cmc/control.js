@@ -1,0 +1,65 @@
+import { create_SNPCMC_1mo, create_SNPCMC_1y,insert_to_db_table, select_data,delete_data} from "./queries.js"
+import {getData1mo,getData1y} from "./api.js"
+
+// 1개월치 데이터 호출/생성/저장
+export const control_queries_1mo = async () => {
+    //create_SNPCMC_1mo();
+    await delete_data("SNPCMC_1mo")
+    let update_data_1mo=[];
+    let data_1mo=[];
+    data_1mo=await getData1mo();
+    for (let i=0; i<data_1mo.length; i++){
+        update_data_1mo.push([
+            data_1mo[i].time,
+            data_1mo[i].SnP,
+            data_1mo[i].CMC]
+        )
+    }
+    await insert_to_db_table("SNPCMC_1mo",update_data_1mo);
+}
+
+// 1년치 데이터 호출/생성/저장
+export const control_queries_1y = async () => {
+    //create_SNPCMC_1y();
+    await delete_data("SNPCMC_1y")
+    let update_data_1y=[]; //쿼리에 최종적으로 들어가기 위한 데이터
+    let data_1y=[];
+    data_1y=await getData1y(); //API 데이터 불러오기
+    for (let i=0; i<data_1y.length; i++){
+        update_data_1y.push([
+            data_1y[i].time,
+            data_1y[i].SnP,
+            data_1y[i].CMC]
+        )
+    }
+    await insert_to_db_table("SNPCMC_1y",update_data_1y); //쿼리에 데이터 넣기
+}
+
+//1개월 SNPCMC 데이터 불러오는 함수
+export const get_snpcmc_data_1mo = async (req, res) => {
+    let data_1mo=[]
+    try {    
+        
+         data_1mo = await select_data("SNPCMC_1mo") //쿼리 선택 후 불러오기
+         console.log("try succeeded");
+         res.send(data_1mo);
+    } catch (error) {
+        console.log(error);
+        res.json({ message: error.message });        
+    }
+}
+//1년 SNPCMC 데이터 불러오는 함수
+export const get_snpcmc_data_1yr = async (req, res) => {
+    let data_1yr=[]
+    try {
+        
+         data_1yr = await select_data("SNPCMC_1y") //쿼리 선택 후 불러오기
+         console.log("try succeeded");
+         res.send(data_1yr);
+    } catch (error) {
+        console.log(error);
+        res.json({ message: error.message });        
+    }
+}
+//control_queries_1mo();
+//control_queries_1y();
