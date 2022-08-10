@@ -5,7 +5,7 @@ import {
     get_category_data_1mo,
     get_category_data_1d
     
-} from "../coin_categories/Queries.js";
+} from "../coin_categories/queries/Queries.js";
  
 const router = express.Router();
  
