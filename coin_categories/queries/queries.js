@@ -128,6 +128,29 @@ export const get_category_data_1yr = async (req, res) => {
     }
 }
 
+//Insert ignore data to column of table
+export const insert_ignore_to_db_table_column = async (tableName, columns, valuesList) => {
+    let sql = 'INSERT IGNORE INTO `' + tableName + "` (";
+    for (let i=0; i<columns.length; i++) {
+      sql = sql + columns[i];
+      if (i+1 < columns.length) {
+        sql = sql + ", ";
+      }
+    }
+    sql = sql + ") " +  ' VALUES (?)';
+    
+    const connection = await mysql.createConnection
+    ({
+      host: MY_HOST,
+      user: MY_USERNAME,
+      password: MY_PASSWORD,
+      database : MY_DATABASE,
+    });
+    const [rows, fields] = await connection.query(sql, [valuesList]);
+    console.log("end query insert_to_db_table() for tableName "+tableName);
+    return rows;
+  }
+
 export const get_coindesk_coins = async () => {
     let sql = "SELECT * from coindesk_coins_list";
     const connection = await mysql.createConnection

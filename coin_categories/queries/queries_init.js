@@ -58,7 +58,8 @@ export const insert_to_db_table = async (tableName, valuesList) => {
     const [rows, fields] = await connection.query(sql, [valuesList]);
     console.log("end query insert_to_db_table() for tableName "+tableName);
     return rows;
-  }
+}
+
 
   //Create table and insert data when coin table does NOT already exist
 //! may have to amend incoming date format
@@ -325,7 +326,7 @@ export const insert_category_history_daily = async (categoryName) => {
 }
 
 
-const nullValueCategory = async (categoryName) => {
+const nullValueCategory = async (categoryName, dailyOrHourly) => {
   //This function checks if there are any Null values in price values of 
   //category tables and replace the null values with their previous values.
   //If the first price is null, replace to the nearest next not null price value
@@ -337,8 +338,15 @@ const nullValueCategory = async (categoryName) => {
       password: MY_PASSWORD,
       database : MY_DATABASE,
   });
-  // const tableName = categoryName + "_prices"; 
-  const tableName = categoryName + "_prices"; // test 
+  
+  let tableName;
+  if (dailyOrHourly == "daily")
+    tableName = categoryName + "_prices"; 
+  else if (dailyOrHourly == "hourly")
+    tableName = categoryName + "_prices_hourly"; 
+  else 
+    console.error("dailyOrHourly prop needs to be valid");
+
   const coinList = await get_coins_specific_category(categoryName);
   console.log(coinList); 
   for (let i=0; i<coinList.length; i++) {

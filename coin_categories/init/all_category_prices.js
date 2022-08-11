@@ -19,7 +19,6 @@ const allCategoryCoinsPrices = async () => {
         let startDate = get_364days_before();
         await insert_dates(categoryTableName, "Date", startDate, endDate);
     }
-
     
 }
 

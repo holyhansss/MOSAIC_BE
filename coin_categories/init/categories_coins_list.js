@@ -2,6 +2,7 @@ import fetch from "node-fetch";
 import axios from "axios";
 import { insert_to_db_table, get_coindesk_coins} from "../queries/queries.js";
 import {create_coindesk_table} from "../queries/queries_init.js"
+import {getDataFromCoinpaprica} from "../api.js"
 
 const initialize_category_db = async () => {
     const data_to_insert_to_db = await getDataFromCoinpaprica();
@@ -23,29 +24,6 @@ const initialize_category_db = async () => {
   }
   console.log("insert_to_db[0]: ", insert_to_db[0]); 
   insert_to_db_table("categories_coins_list", insert_to_db);
-}
-
-const options = {
-  method: 'GET',
-  url: 'https://api.coinpaprika.com/v1/tickers',
-  params: {},
-  headers: {}
-};
-
-const getDataFromCoinpaprica = async () => {
-  let la;  
-  await axios.request(options)
-    .then(
-      async function (response) {  
-        la = await sortCoindeskList(response.data);  
-      }
-    )
-    .catch(
-          function(error){
-            console.log(error);
-          }
-      )
-    return la;
 }
 
 let coinSectorList =  [

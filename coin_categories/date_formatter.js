@@ -6,6 +6,14 @@ export const getToday = () => {
     return today;
 }
 
+export const getNDaysBefore = (nDays) => {
+    let thisDay = new Date(new Date().setUTCDate(new Date().getUTCDate()-nDays));
+    thisDay = JSON.stringify(thisDay)
+    thisDay = thisDay.slice(1, -15);
+    console.log(thisDay);
+    return thisDay;
+}
+
 export const getYesterdaySecondPlusMin = () => {
     let yesterday = new Date(new Date().setUTCDate(new Date().getUTCDate()-1));
     let yesterdayMinus1Min = new Date(yesterday.getTime() + 60000);
