@@ -5,6 +5,7 @@ import {
     get_category_data_1mo,
     get_category_data_1d,
     
+<<<<<<< HEAD
 } from "../coin_categories/Queries.js";
 
 import { 
@@ -13,6 +14,9 @@ import {
     get_snpcmc_data_1yr
     
 } from "../snp_cmc/control.js";
+=======
+} from "../coin_categories/queries/Queries.js";
+>>>>>>> 9b978e963c1c0f5ce8f36c1b70d6536a5de5529d
  
 const router = express.Router();
  
