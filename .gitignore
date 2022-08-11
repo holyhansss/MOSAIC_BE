@@ -1,5 +1,5 @@
 .env
-
+node_modules
 # testing
 /coverage
 
@@ -7,6 +7,11 @@
 /build
 
 database.js
+<<<<<<< HEAD
+database2.js
+dummy.js
+=======
 dummy.js
 
 trash/
+>>>>>>> 9b978e963c1c0f5ce8f36c1b70d6536a5de5529d
