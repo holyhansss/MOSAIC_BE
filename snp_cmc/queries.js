@@ -1,6 +1,20 @@
 import mysql from 'mysql2/promise';
 import {MY_HOST, MY_USERNAME, MY_PASSWORD, MY_DATABASE} from "../config/database2.js";
 
+//CREATE TABLE; SNPCMC_1d
+
+export const create_SNPCMC_1d = async () => {
+  let sql = "CREATE TABLE SNPCMC_1d ( Time varchar(10), SNP varchar(50), CMC varchar(50))"
+  const connection = await mysql.createConnection
+    ({
+        host: MY_HOST,
+        user: MY_USERNAME,
+        password: MY_PASSWORD,
+        database : MY_DATABASE,
+    });
+  const [rows, fields] = await connection.execute(sql);
+  console.log("end query create_SNPCMC()");
+  return rows;}
 
 //CREATE TABLE; SNPCMC_1mo
 
