@@ -1,3 +1,4 @@
+
 import axios from "axios";
 import { insert_to_db_table, get_coindesk_coins} from "../queries/queries.js";
 import {create_coindesk_table} from "../queries/queries_init.js"
@@ -29,7 +30,7 @@ const initializeCategoryDb = async () => {
   console.log("insert_to_db[0]: ", insert_to_db[0]); 
   insert_to_db_table("categories_coins_list", insert_to_db);
 }
-
+initializeCategoryDb ()
 let coinSectorList =  [
     {sector: 'Currency', list : []},
     {sector: 'Smart Contract Platform', list : []},

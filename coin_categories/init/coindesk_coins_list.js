@@ -19,7 +19,7 @@ const createAndInsertCoinDeskCoinsList = async () => {
     }
     await insert_to_db_table("categories_coins_list", coindesk_coins_list_insert_db);
 }
-
+//createAndInsertCoinDeskCoinsList()
 
 const coindesk_coins_list = [
   {
