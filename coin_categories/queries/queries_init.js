@@ -14,7 +14,7 @@ let categories =
 ]
 
 const create_coindesk_table = async () => {
-  let sql = "CREATE TABLE IF NOT EXISTS coindesk_coins_list(CoinSymbol varchar(10), CoinName varchar(50), Category varchar(30) CONSTRAINT PRIMARY KEY (CoinSymbol))"
+  let sql = "CREATE TABLE IF NOT EXISTS coindesk_coins_list(CoinSymbol varchar(10), CoinName varchar(50), Category varchar(30), CONSTRAINT PRIMARY KEY (CoinSymbol))"
   const connection = await mysql.createConnection
       ({
           host: MY_HOST,
