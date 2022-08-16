@@ -4,8 +4,13 @@ import { insert_to_db_table, get_coindesk_coins} from "../queries/queries.js";
 import {create_coindesk_table} from "../queries/queries_init.js"
 import {getDataFromCoinpaprica} from "../api.js"
 
-const initialize_category_db = async () => {
-    const data_to_insert_to_db = await getDataFromCoinpaprica();
+const initializeCategoryDb = async () => {
+  const data_to_insert_to_db = await getDataFromCoinpaprica();
+  try {
+    await create_coindesk_table();    
+  } catch (error) {
+    console.log(error);
+  }
   let insert_to_db = [];  
   console.log("data_to_insert_to_db[0].list[0]: ", data_to_insert_to_db[0].list[0]);
   
