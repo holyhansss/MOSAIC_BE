@@ -7,6 +7,9 @@ import {create_category_history_daily_or_hourly,
 // import {} from '../queries/queries.js'
 import {getToday} from '../date_formatter.js'
 
+
+//TODO test
+
 let categories = 
 [
     "Currency",                 
