@@ -4528,6 +4528,3 @@ const coindesk_coins_list = [
 
  
 //  //
-
-
-

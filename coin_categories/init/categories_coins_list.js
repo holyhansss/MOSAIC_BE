@@ -30,7 +30,7 @@ const initializeCategoryDb = async () => {
   console.log("insert_to_db[0]: ", insert_to_db[0]); 
   insert_to_db_table("categories_coins_list", insert_to_db);
 }
-initializeCategoryDb ()
+
 let coinSectorList =  [
     {sector: 'Currency', list : []},
     {sector: 'Smart Contract Platform', list : []},
