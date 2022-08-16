@@ -13,8 +13,8 @@ let categories =
     "Culture & Entertainment"
 ]
 
-const create_coindesk_table = async () => {
-  let sql = "CREATE TABLE IF NOT EXISTS coindesk_coins_list(CoinSymbol varchar(10), CoinName varchar(50), Category varchar(30), CONSTRAINT PRIMARY KEY (CoinSymbol))"
+export const create_coindesk_table = async () => {
+  let sql = "CREATE TABLE IF NOT EXISTS coindesk_coins_list(CoinSymbol varchar(10), CoinName varchar(50), Category varchar(30), CONSTRAINT PRIMARY KEY (CoinSymbol, CoinName))"
   const connection = await mysql.createConnection
       ({
           host: MY_HOST,
@@ -30,7 +30,7 @@ const create_coindesk_table = async () => {
 
 //Create categories coins list
 export const create_categories_coins_list = async () => {
-    let sql = "CREATE TABLE IF NOT EXISTS categories_coins_list (CoinSymbol varchar(10), CoinName varchar(50), CoinPapricaID varchar(50), Category varchar(30), CoinRank int, CONSTRAINT PRIMARY KEY (CoinSymbol) )"
+    let sql = "CREATE TABLE IF NOT EXISTS categories_coins_list (CoinSymbol varchar(10), CoinName varchar(50), CoinPapricaID varchar(50), Category varchar(30), CoinRank int, CONSTRAINT PRIMARY KEY (CoinSymbol, CoinName))"
     const connection = await mysql.createConnection
       ({
           host: MY_HOST,
@@ -45,7 +45,7 @@ export const create_categories_coins_list = async () => {
 
 
 export const create_temporary_tables_for_category = async () => {
-  let sql = "CREATE TEMPORARY TABLE categories_coins_list (CoinSymbol varchar(10), CoinName varchar(50), CoinPapricaID varchar(50), Category varchar(30), CoinRank int, CONSTRAINT PRIMARY KEY (CoinSymbol))"
+  let sql = "CREATE TEMPORARY TABLE categories_coins_list (CoinSymbol varchar(10), CoinName varchar(50), CoinPapricaID varchar(50), Category varchar(30), CoinRank int, CONSTRAINT PRIMARY KEY (CoinSymbol, CoinName))"
   const connection = await mysql.createConnection
     ({
         host: MY_HOST,
@@ -238,7 +238,7 @@ export const insert_category_history_hourly = async (categoryName) => {
   
         const coinSymbol = coinsList[i].CoinSymbol;
         const coinpaprika_ID = coinsList[i].CoinPapricaID;
-        const data = await getHistoricalData(coinpaprika_ID, yesterday, "1h");««««
+        const data = await getHistoricalData(coinpaprika_ID, yesterday, "1h");//««««
         let priceAndTimeData = [];
   
         for (let j=0; j<data.length; j++) {
