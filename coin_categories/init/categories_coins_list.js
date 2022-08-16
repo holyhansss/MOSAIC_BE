@@ -5,7 +5,7 @@ import {create_coindesk_table} from "../queries/queries_init.js"
 import {getDataFromCoinpaprica} from "../api.js"
 
 const initializeCategoryDb = async () => {
-  const data_to_insert_to_db = await getDataFromCoinpaprica();
+  const data_to_insert_to_db = await sortCoindeskList();
   try {
     await create_coindesk_table();    
   } catch (error) {
@@ -39,7 +39,8 @@ let coinSectorList =  [
     {sector: 'Culture & Entertainment', list : [] }
 ]
 
-export async function sortCoindeskList  (current_coin_marketcap_list) {
+export async function sortCoindeskList  () {
+  const current_coin_marketcap_list = await getDataFromCoinpaprica();
   let coindeskResult = await get_coindesk_coins();
   let dataSorted = [];
   for (let i=0; i < coindeskResult.length; i++) {

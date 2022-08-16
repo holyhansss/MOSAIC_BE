@@ -11,9 +11,7 @@ export const getDataFromCoinpaprica = async () => {
   let la;  
   await axios.request(options)
     .then(
-      async function (response) {  
-        la = await sortCoindeskList(response.data);  
-      }
+        la = response.data;
     )
     .catch(
           function(error){
