@@ -1,4 +1,6 @@
-import {create_coindesk_table, insert_to_db_table} from "../queries/queries_init.js"
+import {create_coindesk_table} from "../queries/queries_init.js"
+import { insert_to_db_table} from "../queries/queries.js";
+
 
 //table name categories_coins_list
 const createAndInsertCoinDeskCoinsList = async () => {
