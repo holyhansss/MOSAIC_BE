@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import axios from "axios";
 import { insert_to_db_table, get_coindesk_coins} from "../queries/queries.js";
 import {create_coindesk_table} from "../queries/queries_init.js"

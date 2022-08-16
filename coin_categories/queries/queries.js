@@ -127,7 +127,7 @@ export const insert_ignore_to_db_table_column = async (tableName, columns, value
       database : MY_DATABASE,
     });
     const [rows, fields] = await connection.query(sql, [valuesList]);
-    console.log("end query insert_to_db_table() for tableName "+tableName);
+    console.log("end query insert_ignore_to_db_table_column() for tableName "+tableName);
     return rows;
   }
 
@@ -289,5 +289,21 @@ export const return_calculated_prices_1d = async (categories, dateRange) => {
     const [rows, fields] = await connection.execute(sql);
     console.log("end query return_calculated_prices()");
     console.log("rows: ", rows);
+    return rows;
+}
+
+//Insert data to table
+export const insert_to_db_table = async (tableName, valuesList) => {
+    let sql = 'INSERT INTO `' + tableName + '` VALUES ?';
+    
+    const connection = await mysql.createConnection
+    ({
+      host: MY_HOST,
+      user: MY_USERNAME,
+      password: MY_PASSWORD,
+      database : MY_DATABASE,
+  });
+    const [rows, fields] = await connection.query(sql, [valuesList]);
+    console.log("end query insert_to_db_table() for tableName "+tableName);
     return rows;
 }

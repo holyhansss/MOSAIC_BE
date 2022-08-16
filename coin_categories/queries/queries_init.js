@@ -44,23 +44,6 @@ export const create_categories_coins_list = async () => {
   }
 
 
-//Insert data to table
-export const insert_to_db_table = async (tableName, valuesList) => {
-    let sql = 'INSERT INTO `' + tableName + '` VALUES ?';
-    
-    const connection = await mysql.createConnection
-    ({
-      host: MY_HOST,
-      user: MY_USERNAME,
-      password: MY_PASSWORD,
-      database : MY_DATABASE,
-  });
-    const [rows, fields] = await connection.query(sql, [valuesList]);
-    console.log("end query insert_to_db_table() for tableName "+tableName);
-    return rows;
-}
-
-
 export const create_temporary_tables_for_category = async () => {
   let sql = "CREATE TEMPORARY TABLE categories_coins_list (CoinSymbol varchar(10), CoinName varchar(50), CoinPapricaID varchar(50), Category varchar(30), CoinRank int, CONSTRAINT PRIMARY KEY (CoinSymbol))"
   const connection = await mysql.createConnection
