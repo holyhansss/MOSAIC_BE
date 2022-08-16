@@ -10,3 +10,5 @@ database.js
 dummy.js
 
 trash/
+
+node_modules

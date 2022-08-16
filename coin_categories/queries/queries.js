@@ -3,20 +3,21 @@ import {MY_HOST, MY_USERNAME, MY_PASSWORD, MY_DATABASE} from "../../config/datab
 import {getHistoricalData} from "../api.js"
 import {getToday, getYesterdaySecondPlusMin, get_24_hourly_time_list} from "../date_formatter.js";
 
+const allCategories = 
+[
+    [["Currency"],[]],                 
+    [["Smart Contract Platform"] ,[]],
+    [["Computing"] , []],
+    [["DeFi"] , []],        
+    [["Culture & Entertainment"] , []],
+    // [["Digitization"], []]
+]
+
 export const get_category_data_1d = async (req, res) => {
     console.log("Categories to show 1y:", req.query.categoryArray);
     const categoriesToShowArray = req.query.categoryArray; 
     console.log("categoriesToShowArray 1y: ", categoriesToShowArray);
 
-    let allCategories = 
-    [
-        [["Currency"],[]],                 
-        [["Smart Contract Platform"] ,[]],
-        [["Computing"] , []],
-        [["DeFi"] , []],        
-        [["Culture & Entertainment"] , []],
-        // [["Digitization"], []]
-    ]
     let categories = [];
     for (let i=0; i<allCategories.length; i++) {
         if (categoriesToShowArray[i] == 'false')
@@ -29,7 +30,8 @@ export const get_category_data_1d = async (req, res) => {
     let datesAndPrices = []
     try {
         for (let i=0; i<categories.length; i++){
-            const thisCategoryCoins = await get_coins_specific_category(categories[i][0]); //카테고리 해당되는 코인들 삽입
+            const thisCategoryCoins = await get_coins_specific_category(categories[i][0]); 
+            //카테고리 해당되는 코인들 삽입
             for (let j=0; j<thisCategoryCoins.length; j++) {
                 categories[i][1].push(thisCategoryCoins[j].CoinSymbol)
             }
@@ -48,15 +50,6 @@ export const get_category_data_1mo = async (req, res) => {
     const categoriesToShowArray = req.query.categoryArray; 
     console.log("categoriesToShowArray 1mo: ", categoriesToShowArray);
 
-    let allCategories = 
-    [
-        [["Currency"],[]],                 
-        [["Smart Contract Platform"] ,[]],
-        [["Computing"] , []],
-        [["DeFi"] , []],        
-        [["Culture & Entertainment"] , []],
-        // [["Digitization"], []]
-    ]
     let categories = [];
     for (let i=0; i<allCategories.length; i++) {
         if (categoriesToShowArray[i] == 'false')
@@ -70,11 +63,12 @@ export const get_category_data_1mo = async (req, res) => {
     try {
         for (let i=0; i<categories.length; i++){
             const thisCategoryCoins = await get_coins_specific_category(categories[i][0]);
-            for (let j=0; j<thisCategoryCoins.length; j++) {
+            for (let j=0; j<thisCategoryCoins.length; j++) { 
+                //카테고리 해당되는 코인들 삽입
                 categories[i][1].push(thisCategoryCoins[j].CoinSymbol)
             }
         }
-         datesAndPrices = await return_calculated_prices(categories, "1mo")
+         datesAndPrices = await return_calculated_prices(categories, "1mo") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
          console.log("try succeeded");
          res.send(datesAndPrices);
     } catch (error) {
@@ -88,14 +82,6 @@ export const get_category_data_1yr = async (req, res) => {
     const categoriesToShowArray = req.query.categoryArray; 
     console.log("categoriesToShowArray 1y: ", categoriesToShowArray);
 
-    let allCategories =  
-    [
-        [["Currency"],[]],                 
-        [["Smart Contract Platform"] ,[]],
-        [["Computing"] , []],
-        [["DeFi"] , []],        
-        [["Culture & Entertainment"] , []],
-    ]
     let categories = [];
     for (let i=0; i<allCategories.length; i++) {
         if (categoriesToShowArray[i] == 'false')
@@ -107,19 +93,13 @@ export const get_category_data_1yr = async (req, res) => {
     let datesAndPrices = [];
     try {
         for (let i=0; i<categories.length; i++){
-            if (categoriesToShowArray[i] == 'false'){
-                console.log("category array #" + i + "is false");
-            }else if (categoriesToShowArray[i] == 'true') {
-                console.log("category array #" + i + "is true");
-            }else  {
-                console.log("category array #" + i + "is neither true nor false");
-            }
             const thisCategoryCoins = await get_coins_specific_category(categories[i][0]);
             for (let j=0; j<thisCategoryCoins.length; j++) {
+                //카테고리 해당되는 코인들 삽입
                 categories[i][1].push(thisCategoryCoins[j].CoinSymbol)
             }
         }
-         datesAndPrices = await return_calculated_prices(categories, "1y")
+         datesAndPrices = await return_calculated_prices(categories, "1y") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
          console.log("try succeeded");
          res.send(datesAndPrices);
     } catch (error) {
