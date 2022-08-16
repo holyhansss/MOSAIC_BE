@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const getDataFromCoinpaprica = async () => {
+export const getDataFromCoinpaprica = async () => {
   const options = {
     method: 'GET',
     url: 'https://api.coinpaprika.com/v1/tickers',
