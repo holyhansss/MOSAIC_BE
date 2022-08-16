@@ -1,5 +1,22 @@
-import { create_SNPCMC_1mo, create_SNPCMC_1y,insert_to_db_table, select_data,delete_data} from "./queries.js"
-import {getData1mo,getData1y} from "./api.js"
+import {create_SNPCMC_1d, create_SNPCMC_1mo, create_SNPCMC_1y,insert_to_db_table, select_data,delete_data} from "./queries.js"
+import {getData1mo,getData1y,getData1d} from "./api.js"
+
+// 하루 데이터 호출/생성/저장
+export const control_queries_1d = async () => {
+    //await create_SNPCMC_1d();
+    await delete_data("SNPCMC_1d")
+    let update_data_1d=[];
+    let data_1d=[];
+    data_1d=await getData1d();
+    for (let i=0; i<data_1d.length; i++){
+        update_data_1d.push([
+            data_1d[i].time,
+            data_1d[i].SnP,
+            data_1d[i].CMC]
+        )
+    }
+    await insert_to_db_table("SNPCMC_1d",update_data_1d);
+}
 
 // 1개월치 데이터 호출/생성/저장
 export const control_queries_1mo = async () => {
@@ -35,6 +52,20 @@ export const control_queries_1y = async () => {
     await insert_to_db_table("SNPCMC_1y",update_data_1y); //쿼리에 데이터 넣기
 }
 
+//하루 SNPCMC 데이터 불러오는 함수
+export const get_snpcmc_data_1d = async (req, res) => {
+    let data_1d=[]
+    try {    
+        
+         data_1d = await select_data("SNPCMC_1d") //쿼리 선택 후 불러오기
+         console.log("try succeeded");
+         res.send(data_1d);
+    } catch (error) {
+        console.log(error);
+        res.json({ message: error.message });        
+    }
+}
+
 //1개월 SNPCMC 데이터 불러오는 함수
 export const get_snpcmc_data_1mo = async (req, res) => {
     let data_1mo=[]
@@ -61,5 +92,8 @@ export const get_snpcmc_data_1yr = async (req, res) => {
         res.json({ message: error.message });        
     }
 }
+
+//실행 함수
+//control_queries_1d();
 //control_queries_1mo();
 //control_queries_1y();

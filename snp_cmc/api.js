@@ -91,7 +91,6 @@ let SNPOptions_1mo = {
 let CMCOptions_1mo = {
   method: 'GET',
   url: "https://yfapi.net/v8/finance/chart/^CMC200?comparisons=MSFT%2C%5EVIX&range=1mo&region=US&interval=1d&lang=en&events=div%2Csplit",
-//   url: "https://yfapi.net/v8/finance/chart/GSPC?comparisons=MSFT%2C%5EVIX&range=1mo&region=US&interval=1d&lang=en&events=div%2Csplit",
   params: {
 
     modules: 'defaultKeyStatistics,assetProfile', 
@@ -193,7 +192,7 @@ async function getSNP_1d(datacall) {
   .then((res,any) => {
       const IndexData = res.data.chart.result[0].indicators.quote[0].close.map((data, index) => (
         data && {
-          time:res.data.chart.result[0].timestamp[index],
+          time:res.data.chart.result[0].timestamp[index]+32400,
           SnP: data
         }))
         
@@ -216,7 +215,9 @@ async function getSNP_1d(datacall) {
           else{  
           };  
       }
-      
+      for (const item of IndexData){  
+        item.SnP=100/SNP_first*item.SnP
+      }
       returnValue = IndexData
     });
   return returnValue
@@ -228,7 +229,7 @@ async function getCMC_1d(datacall) {
     .then((res, any) => {
         const IndexData2 = res.data.chart.result[0].indicators.quote[0].close.map((data, index) => (
           data && {
-            time:res.data.chart.result[0].timestamp[index],
+            time:res.data.chart.result[0].timestamp[index]+32400,
             CMC: data
           }))
         
@@ -251,6 +252,10 @@ async function getCMC_1d(datacall) {
             else{  
             };  
         }
+        for (const item of IndexData2){      
+          item.CMC=100/CMC_first*item.CMC
+          }
+      
        
       returnValue = IndexData2
     });
@@ -262,21 +267,22 @@ export const getData1d = async () => {
   const resTemp=[];
   const data1 = await getSNP_1d(SNPOptions_1d);
   const data2 = await getCMC_1d(CMCOptions_1d);
-  console.log(data1);
-  console.log(data2);
+  //console.log(data1);
+  //console.log(data2);
 
-  // for (let i =0; i< data1.length; i++){
+  for (let i =0; i< data1.length; i++){
   
-  //   resTemp.push({
-  //       time:data1[i].time,
-  //       SnP:data1[i].SnP,
-  //       CMC:data2[i].CMC,
-  //   });
-  //   }
-  // console.log("res: ", resTemp);
+    resTemp.push({
+        time:data1[i].time,
+        SnP:data1[i].SnP,
+        CMC:data2[i].CMC,
+    });
+    }
+  
+  console.log("res: ", resTemp);
   return resTemp;
 }
 
-getData1d()
+//getData1d()
 //getData1mo()
 //getData1y()
