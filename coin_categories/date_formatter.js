@@ -20,7 +20,6 @@ export const getYesterdaySecondPlusMin = () => {
     yesterdayMinus1Min = JSON.stringify(yesterdayMinus1Min)
     yesterdayMinus1Min = yesterdayMinus1Min.slice(1, -6);
     yesterdayMinus1Min = yesterdayMinus1Min + "Z"
-    console.log(yesterdayMinus1Min);
     return yesterdayMinus1Min;
 }
 
