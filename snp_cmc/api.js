@@ -75,7 +75,7 @@ async function getCMC(datacall) {
   
   return returnValue
 };
-
+// 호출 Method
 let SNPOptions_1mo = {
   method: 'GET',
   url: "https://yfapi.net/v8/finance/chart/^GSPC?comparisons=MSFT%2C%5EVIX&range=1mo&region=US&interval=1d&lang=en&events=div%2Csplit",
