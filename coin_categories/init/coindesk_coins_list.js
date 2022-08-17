@@ -1,9 +1,9 @@
-import {create_coindesk_table} from "../queries/queries_init.js"
-import { insert_to_db_table} from "../queries/queries.js";
+import {create_coindesk_table, ignore_stablecoins} from "../queries/queries_init.js"
+import { insert_to_db_columns} from "../queries/queries.js";
 
 
 //table name categories_coins_list
-const createAndInsertCoinDeskCoinsList = async () => {
+export const createAndInsertCoinDeskCoinsList = async () => {
     await create_coindesk_table();
 
     let coindesk_coins_list_insert_db = [];
@@ -17,10 +17,120 @@ const createAndInsertCoinDeskCoinsList = async () => {
             ]
         )
     }
-    await insert_to_db_table("coindesk_coins_list", coindesk_coins_list_insert_db);
+    await insert_to_db_columns("coindesk_coins_list", ["CoinSymbol", "CoinName", "Category"] , coindesk_coins_list_insert_db)
+    let stablecoinsToIgnore = []
+
+    for (let i=0; i<stablecoins_list.length; i++) {
+      stablecoinsToIgnore.push(
+        [
+          stablecoins_list[i]["Symbol"],
+          stablecoins_list[i]["Name"]
+        ]
+      )
+    }
+    await ignore_stablecoins(stablecoinsToIgnore);
 }
 
 //createAndInsertCoinDeskCoinsList()
+
+const stablecoins_list = [
+  {    
+      "Symbol": "USDT",
+      "Name": "Tether",
+  }, 
+  {
+        "Symbol": "USDC",
+    "Name": "USD Coin",
+  },
+  {
+       "Symbol": "BUSD",
+    "Name": "Binance USD",
+ 
+  },
+  {
+        "Symbol": "UST",
+    "Name": "TerraUSD",
+
+  },
+  {
+       "Symbol": "DAI",
+    "Name": "Dai",
+ 
+  },
+  {
+        "Symbol": "TUSD",
+    "Name": "TrueUSD",
+
+  },
+  {   
+      "Symbol": "USDP",
+      "Name": "Pax Dollar",
+  },
+  {
+        "Symbol": "USDN",
+      "Name": "Neutrino USD",
+
+  },
+  {
+      "Symbol": "FEI",
+      "Name": "Fei USD",
+  
+  },
+  {
+      "Symbol": "FXS",
+      "Name": "Frax Share",
+  
+  },
+  {
+        "Symbol": "TRIBE",
+      "Name": "Tribe",
+
+  },
+  {
+        "Symbol": "LUSD",
+      "Name": "Liquity USD",
+
+  },
+  {
+      "Symbol": "HUSD",
+      "Name": "HUSD", 
+  },
+  {
+      "Symbol": "GUSD",
+      "Name": "Gemini Dollar",
+
+  },
+  {
+      "Symbol": "XSGD",
+      "Name": "XSGD",
+
+  },
+  {
+        "Symbol": "USDX",
+      "Name": "USDX",
+
+  },
+  {
+        "Symbol": "OUSD",
+      "Name": "Origin Dollar",
+
+  },
+  {
+      "Symbol": "SUSD",
+      "Name": "sUSD",
+
+  },
+  {
+      "Symbol": "EURS",
+      "Name": "STASIS EURO",
+
+  },
+  {
+      "Symbol": "CUSD",
+      "Name": "Celo Dollar",
+  }
+]
+
 
 const coindesk_coins_list = [
   {
@@ -41,15 +151,15 @@ const coindesk_coins_list = [
     "Industry": "Single Chain",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 3,
-  //   "Symbol": "USDT",
-  //   "Name": "Tether",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent CeFi Currency",
-  //   "FIELD7": 2
-  // },
+  {
+    "DACS Rank": 3,
+    "Symbol": "USDT",
+    "Name": "Tether",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent CeFi Currency",
+    "FIELD7": 2
+  },
   {
     "DACS Rank": 4,
     "Symbol": "BNB",
@@ -59,15 +169,15 @@ const coindesk_coins_list = [
     "Industry": "Single Chain",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 5,
-  //   "Symbol": "USDC",
-  //   "Name": "USD Coin",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent CeFi Currency",
-  //   "FIELD7": 3
-  // },
+  {
+    "DACS Rank": 5,
+    "Symbol": "USDC",
+    "Name": "USD Coin",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent CeFi Currency",
+    "FIELD7": 3
+  },
   {
     "DACS Rank": 6,
     "Symbol": "SOL",
@@ -131,24 +241,24 @@ const coindesk_coins_list = [
     "Industry": "Transparent DeFi Currency",
     "FIELD7": 5
   },
-  // {
-  //   "DACS Rank": 13,
-  //   "Symbol": "BUSD",
-  //   "Name": "Binance USD",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent CeFi Currency",
-  //   "FIELD7": 6
-  // },
-  // {
-  //   "DACS Rank": 14,
-  //   "Symbol": "UST",
-  //   "Name": "TerraUSD",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent DeFi Currency",
-  //   "FIELD7": 7
-  // },
+  {
+    "DACS Rank": 13,
+    "Symbol": "BUSD",
+    "Name": "Binance USD",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent CeFi Currency",
+    "FIELD7": 6
+  },
+  {
+    "DACS Rank": 14,
+    "Symbol": "UST",
+    "Name": "TerraUSD",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent DeFi Currency",
+    "FIELD7": 7
+  },
   {
     "DACS Rank": 15,
     "Symbol": "SHIB",
@@ -176,15 +286,15 @@ const coindesk_coins_list = [
     "Industry": "Transparent CeFi Currency",
     "FIELD7": 9
   },
-  // {
-  //   "DACS Rank": 18,
-  //   "Symbol": "DAI",
-  //   "Name": "Dai",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent CeFi Currency",
-  //   "FIELD7": 10
-  // },
+  {
+    "DACS Rank": 18,
+    "Symbol": "DAI",
+    "Name": "Dai",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent CeFi Currency",
+    "FIELD7": 10
+  },
   {
     "DACS Rank": 19,
     "Symbol": "NEAR",
@@ -689,15 +799,15 @@ const coindesk_coins_list = [
     "Industry": "Private",
     "FIELD7": 23
   },
-  // {
-  //   "DACS Rank": 75,
-  //   "Symbol": "TUSD",
-  //   "Name": "TrueUSD",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent CeFi Currency",
-  //   "FIELD7": 24
-  // },
+  {
+    "DACS Rank": 75,
+    "Symbol": "TUSD",
+    "Name": "TrueUSD",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent CeFi Currency",
+    "FIELD7": 24
+  },
   {
     "DACS Rank": 76,
     "Symbol": "NEXO",
@@ -815,15 +925,15 @@ const coindesk_coins_list = [
     "Industry": "Single Chain",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 89,
-  //   "Symbol": "USDP",
-  //   "Name": "Pax Dollar",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent CeFi Currency",
-  //   "FIELD7": 29
-  // },
+  {
+    "DACS Rank": 89,
+    "Symbol": "USDP",
+    "Name": "Pax Dollar",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent CeFi Currency",
+    "FIELD7": 29
+  },
   {
     "DACS Rank": 90,
     "Symbol": "IOTX",
@@ -833,15 +943,15 @@ const coindesk_coins_list = [
     "Industry": "IoT",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 91,
-  //   "Symbol": "USDN",
-  //   "Name": "Neutrino USD",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent (Other)",
-  //   "FIELD7": 30
-  // },
+  {
+    "DACS Rank": 91,
+    "Symbol": "USDN",
+    "Name": "Neutrino USD",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent (Other)",
+    "FIELD7": 30
+  },
   {
     "DACS Rank": 92,
     "Symbol": "DCR",
@@ -1355,15 +1465,15 @@ const coindesk_coins_list = [
     "Industry": "Social",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 149,
-  //   "Symbol": "FEI",
-  //   "Name": "Fei USD",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent DeFi Currency",
-  //   "FIELD7": 42
-  // },
+  {
+    "DACS Rank": 149,
+    "Symbol": "FEI",
+    "Name": "Fei USD",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent DeFi Currency",
+    "FIELD7": 42
+  },
   {
     "DACS Rank": 150,
     "Symbol": "TWT",
@@ -1463,15 +1573,15 @@ const coindesk_coins_list = [
     "Industry": "Digitization",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 161,
-  //   "Symbol": "FXS",
-  //   "Name": "Frax Share",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent DeFi Currency",
-  //   "FIELD7": 45
-  // },
+  {
+    "DACS Rank": 161,
+    "Symbol": "FXS",
+    "Name": "Frax Share",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent DeFi Currency",
+    "FIELD7": 45
+  },
   {
     "DACS Rank": 162,
     "Symbol": "WIN",
@@ -1724,15 +1834,15 @@ const coindesk_coins_list = [
     "Industry": "AMM",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 190,
-  //   "Symbol": "TRIBE",
-  //   "Name": "Tribe",
-  //   "Sector": "DeFi",
-  //   "Industry Group": "DAO",
-  //   "Industry": "DAO (Other)",
-  //   "FIELD7": null
-  // },
+  {
+    "DACS Rank": 190,
+    "Symbol": "TRIBE",
+    "Name": "Tribe",
+    "Sector": "DeFi",
+    "Industry Group": "DAO",
+    "Industry": "DAO (Other)",
+    "FIELD7": null
+  },
   {
     "DACS Rank": 191,
     "Symbol": "REQ",
@@ -1850,15 +1960,15 @@ const coindesk_coins_list = [
     "Industry": "Insurance",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 204,
-  //   "Symbol": "LUSD",
-  //   "Name": "Liquity USD",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent (Other)",
-  //   "FIELD7": 57
-  // },
+  {
+    "DACS Rank": 204,
+    "Symbol": "LUSD",
+    "Name": "Liquity USD",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent (Other)",
+    "FIELD7": 57
+  },
   {
     "DACS Rank": 205,
     "Symbol": "RACA",
@@ -1940,15 +2050,15 @@ const coindesk_coins_list = [
     "Industry": "Single Chain",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 214,
-  //   "Symbol": "HUSD",
-  //   "Name": "HUSD",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent CeFi Currency",
-  //   "FIELD7": 62
-  // },
+  {
+    "DACS Rank": 214,
+    "Symbol": "HUSD",
+    "Name": "HUSD",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent CeFi Currency",
+    "FIELD7": 62
+  },
   {
     "DACS Rank": 215,
     "Symbol": "KOK",
@@ -2147,15 +2257,15 @@ const coindesk_coins_list = [
     "Industry": "Digitization",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 237,
-  //   "Symbol": "GUSD",
-  //   "Name": "Gemini Dollar",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent CeFi Currency",
-  //   "FIELD7": 72
-  // },
+  {
+    "DACS Rank": 237,
+    "Symbol": "GUSD",
+    "Name": "Gemini Dollar",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent CeFi Currency",
+    "FIELD7": 72
+  },
   {
     "DACS Rank": 238,
     "Symbol": "UFO",
@@ -2642,15 +2752,15 @@ const coindesk_coins_list = [
     "Industry": "Shared Network",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 292,
-  //   "Symbol": "XSGD",
-  //   "Name": "XSGD",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent CeFi Currency",
-  //   "FIELD7": 81
-  // },
+  {
+    "DACS Rank": 292,
+    "Symbol": "XSGD",
+    "Name": "XSGD",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent CeFi Currency",
+    "FIELD7": 81
+  },
   {
     "DACS Rank": 293,
     "Symbol": "QKC",
@@ -2687,15 +2797,15 @@ const coindesk_coins_list = [
     "Industry": "Social",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 297,
-  //   "Symbol": "USDX",
-  //   "Name": "USDX",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent DeFi Currency",
-  //   "FIELD7": 82
-  // },
+  {
+    "DACS Rank": 297,
+    "Symbol": "USDX",
+    "Name": "USDX",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent DeFi Currency",
+    "FIELD7": 82
+  },
   {
     "DACS Rank": 298,
     "Symbol": "SPA",
@@ -2858,15 +2968,15 @@ const coindesk_coins_list = [
     "Industry": "Art",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 316,
-  //   "Symbol": "OUSD",
-  //   "Name": "Origin Dollar",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent DeFi Currency",
-  //   "FIELD7": 86
-  // },
+  {
+    "DACS Rank": 316,
+    "Symbol": "OUSD",
+    "Name": "Origin Dollar",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent DeFi Currency",
+    "FIELD7": 86
+  },
   {
     "DACS Rank": 317,
     "Symbol": "ALCX",
@@ -2948,24 +3058,24 @@ const coindesk_coins_list = [
     "Industry": "Derivatives",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 326,
-  //   "Symbol": "SUSD",
-  //   "Name": "sUSD",
-  //   "Sector": "DeFi",
-  //   "Industry Group": "Derivatives",
-  //   "Industry": "Derivatives",
-  //   "FIELD7": null
-  // },
-  // {
-  //   "DACS Rank": 327,
-  //   "Symbol": "EURS",
-  //   "Name": "STASIS EURO",
-  //   "Sector": "Computing",
-  //   "Industry Group": "IoT",
-  //   "Industry": "IoT",
-  //   "FIELD7": null
-  // },
+  {
+    "DACS Rank": 326,
+    "Symbol": "SUSD",
+    "Name": "sUSD",
+    "Sector": "DeFi",
+    "Industry Group": "Derivatives",
+    "Industry": "Derivatives",
+    "FIELD7": null
+  },
+  {
+    "DACS Rank": 327,
+    "Symbol": "EURS",
+    "Name": "STASIS EURO",
+    "Sector": "Computing",
+    "Industry Group": "IoT",
+    "Industry": "IoT",
+    "FIELD7": null
+  },
   {
     "DACS Rank": 328,
     "Symbol": "XPR",
@@ -3911,15 +4021,15 @@ const coindesk_coins_list = [
     "Industry": "Exchanges (Other)",
     "FIELD7": null
   },
-  // {
-  //   "DACS Rank": 433,
-  //   "Symbol": "CUSD",
-  //   "Name": "Celo Dollar",
-  //   "Sector": "Currency",
-  //   "Industry Group": "Transparent",
-  //   "Industry": "Transparent DeFi Currency",
-  //   "FIELD7": 119
-  // },
+  {
+    "DACS Rank": 433,
+    "Symbol": "CUSD",
+    "Name": "Celo Dollar",
+    "Sector": "Currency",
+    "Industry Group": "Transparent",
+    "Industry": "Transparent DeFi Currency",
+    "FIELD7": 119
+  },
   {
     "DACS Rank": 434,
     "Symbol": "ALPINE",
@@ -4523,8 +4633,4 @@ const coindesk_coins_list = [
     "Industry": "Oracle",
     "FIELD7": null
   }
- ]
-
-
- 
-//  //
+]

@@ -2,10 +2,11 @@ import {create_category_history_daily_or_hourly,
         insert_dates, 
         insert_time_data_hourly, 
         insert_category_history_daily, 
-        insert_category_history_hourly
+        insert_category_history_hourly,
+        nullValueCategory
     } from '../queries/queries_init.js'
 // import {} from '../queries/queries.js'
-import {getToday} from '../date_formatter.js'
+import {getToday, get_364days_before} from '../date_formatter.js'
 
 
 //TODO test
@@ -19,9 +20,9 @@ let categories =
     "Culture & Entertainment"
 ]
 
-const allCategoryCoinsPricesDaily = async () => {
+export const allCategoryCoinsPricesDaily = async () => {
     for (let i=0; i<categories.length; i++){
-        const currCategory = category[i];
+        const currCategory = categories[i];
         try {
             const returnTrue = await create_category_history_daily_or_hourly(currCategory, "daily");
             if (returnTrue != true){
@@ -33,7 +34,7 @@ const allCategoryCoinsPricesDaily = async () => {
             console.error("create_category_history_daily_or_hourly() failed");          
             return false;  
         }
-        let categoryTableName = category[i] + "_prices";
+        let categoryTableName = categories[i] + "_prices";
         let endDate = getToday();
         let startDate = get_364days_before();
         
@@ -59,12 +60,20 @@ const allCategoryCoinsPricesDaily = async () => {
             console.error("insert_category_history_daily() failed");           
             return false; 
         }
+        try {
+            await nullValueCategory(categories[i], "daily")
+        } catch (error) {
+            console.error(error);
+            console.error("nullValueCategory() failed");
+            return false
+        }
     }   
+    return true
 }
 
-const allCategoryCoinsPricesHourly = async () => {
+export const allCategoryCoinsPricesHourly = async () => {
     for (let i=0; i<categories.length; i++){
-        const currCategory = category[i];
+        const currCategory = categories[i];
         try {
             const returnTrue = await create_category_history_daily_or_hourly(currCategory, "hourly");
             if (returnTrue != true){
@@ -76,7 +85,7 @@ const allCategoryCoinsPricesHourly = async () => {
             console.error("create_category_history_daily_or_hourly() failed");           
             return false; 
         }
-        let categoryTableName = category[i] + "_prices_hourly";
+        let categoryTableName = categories[i] + "_prices_hourly";
         let endDate = getToday();
         let startDate = get_364days_before();
 
@@ -91,7 +100,6 @@ const allCategoryCoinsPricesHourly = async () => {
             console.error("insert_time_data_hourly() failed");           
             return false; 
         }
-
         try {
             const returnTrue = await insert_category_history_hourly(currCategory);
             if (returnTrue != true){
@@ -103,6 +111,12 @@ const allCategoryCoinsPricesHourly = async () => {
             console.error("insert_category_history_hourly() failed");           
             return false; 
         }
-
+        try {
+            await nullValueCategory(categories[i], "hourly")
+        } catch (error) {
+            console.error(error);
+            console.error("nullValueCategory() failed");
+            return false
+        }
     }   
 }

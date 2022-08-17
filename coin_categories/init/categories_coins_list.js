@@ -1,18 +1,17 @@
 
 import axios from "axios";
-import { insert_to_db_table, get_coindesk_coins} from "../queries/queries.js";
-import {create_coindesk_table} from "../queries/queries_init.js"
+import {insert_to_db_table, get_coindesk_coins} from "../queries/queries.js";
+import {create_categories_coins_list} from "../queries/queries_init.js"
 import {getDataFromCoinpaprica} from "../api.js"
 
-const initializeCategoryDb = async () => {
-  const data_to_insert_to_db = await sortCoindeskList();
+export const initializeCategoryDb = async () => {
   try {
-    await create_coindesk_table();    
+    await create_categories_coins_list();    
   } catch (error) {
     console.log(error);
   }
+  const data_to_insert_to_db = await sortCoindeskList();
   let insert_to_db = [];  
-  console.log("data_to_insert_to_db[0].list[0]: ", data_to_insert_to_db[0].list[0]);
   
   for (let i=0; i<data_to_insert_to_db.length; i++){
     for (let j=0; j<data_to_insert_to_db[i].list.length; j++){
@@ -27,7 +26,6 @@ const initializeCategoryDb = async () => {
       ); 
     }
   }
-  console.log("insert_to_db[0]: ", insert_to_db[0]); 
   insert_to_db_table("categories_coins_list", insert_to_db);
 }
 
@@ -49,13 +47,18 @@ export async function sortCoindeskList  () {
   for (let i=0; i < coindeskResult.length; i++) {
     for (let j=0; j < current_coin_marketcap_list.length; j++) {
       if (coindeskResult[i].CoinSymbol == current_coin_marketcap_list[j].symbol){
-        coindeskResult[i]["Rank"] = current_coin_marketcap_list[j].rank;     //
-        coindeskResult[i].CoinPapricaID = current_coin_marketcap_list[j].id; // Inserting new keys and data Rank and CoinPaprikaID
-        dataSorted.push(coindeskResult[i]);
+        if (coindeskResult[i].IgnoreThis == 0) {
+          //if stablecoin do not add to categorycoinslist
+          coindeskResult[i]["Rank"] = current_coin_marketcap_list[j].rank;     //
+          coindeskResult[i].CoinPapricaID = current_coin_marketcap_list[j].id; // Inserting new keys and data Rank and CoinPaprikaID
+          dataSorted.push(coindeskResult[i]); 
+        }
         break;
       }
     }
   }  
+  dataSorted.sort((a, b) => a["Rank"] - b["Rank"]);
+
   let isAllFull = 0;
   for (let i = 0; i < dataSorted.length; i++) {
     for (let j = 0; j < coinSectorList.length; j++) {
