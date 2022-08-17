@@ -8,17 +8,16 @@ export const getDataFromCoinpaprica = async () => {
     headers: {}
   };  
 
-  let la;  
+  let apiResponse;  
   await axios.request(options)
     .then(
-        la = response.data;
+      function (response) {
+        apiResponse = response.data
+    }).catch(function (error) {
+      console.error(error);
+      }
     )
-    .catch(
-          function(error){
-            console.log(error);
-          }
-      )
-    return la;
+    return apiResponse;
 }
 
 

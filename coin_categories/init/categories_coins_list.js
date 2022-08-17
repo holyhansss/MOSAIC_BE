@@ -31,24 +31,27 @@ const initializeCategoryDb = async () => {
   insert_to_db_table("categories_coins_list", insert_to_db);
 }
 
-let coinSectorList =  [
+
+export async function sortCoindeskList  () {
+
+  let coinSectorList =  [
     {sector: 'Currency', list : []},
     {sector: 'Smart Contract Platform', list : []},
     {sector: 'Computing', list : [] },
     {sector: 'DeFi', list : [] },
     {sector: 'Culture & Entertainment', list : [] }
-]
+  ]
 
-export async function sortCoindeskList  () {
   const current_coin_marketcap_list = await getDataFromCoinpaprica();
   let coindeskResult = await get_coindesk_coins();
   let dataSorted = [];
+
   for (let i=0; i < coindeskResult.length; i++) {
     for (let j=0; j < current_coin_marketcap_list.length; j++) {
       if (coindeskResult[i].CoinSymbol == current_coin_marketcap_list[j].symbol){
         coindeskResult[i]["Rank"] = current_coin_marketcap_list[j].rank;     //
         coindeskResult[i].CoinPapricaID = current_coin_marketcap_list[j].id; // Inserting new keys and data Rank and CoinPaprikaID
-        dataSorted.push(coindesk_coins_list[i]);
+        dataSorted.push(coindeskResult[i]);
         break;
       }
     }

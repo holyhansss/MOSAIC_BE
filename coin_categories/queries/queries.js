@@ -52,7 +52,6 @@ export const get_category_data_1d = async (req, res) => {
             }
         }
          datesAndPrices = await return_calculated_prices_1d(categories, "1d") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
-         console.log("try succeeded");
          res.send(datesAndPrices);
     } catch (error) {
         console.log(error);
@@ -84,7 +83,6 @@ export const get_category_data_1mo = async (req, res) => {
             }
         }
          datesAndPrices = await return_calculated_prices(categories, "1mo") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
-         console.log("try succeeded");
          res.send(datesAndPrices);
     } catch (error) {
         console.log(error);
@@ -115,7 +113,6 @@ export const get_category_data_1yr = async (req, res) => {
             }
         }
          datesAndPrices = await return_calculated_prices(categories, "1y") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
-         console.log("try succeeded");
          res.send(datesAndPrices);
     } catch (error) {
         console.log(error);
@@ -157,9 +154,25 @@ export const get_coindesk_coins = async () => {
     });
     const [rows, fields] = await connection.execute(sql);
 
-    console.log("end query get_all_coins_all_categories()");
+    console.log("end query get_coindesk_coins()");
     return rows;
   }
+
+export const get_categories_coins_sorted_by_rank = async () => {
+let sql = "SELECT * from categories_coins_list order by CoinRank";
+const connection = await mysql.createConnection
+({
+    host: MY_HOST,
+    user: MY_USERNAME,
+    password: MY_PASSWORD,
+    database : MY_DATABASE,
+});
+const [rows, fields] = await connection.execute(sql);
+
+console.log("end query get_categories_coins()");
+return rows;
+}
+
 
 export const get_coins_specific_category = async (thisCategory) => {
     let sql = "SELECT CoinSymbol, CoinPapricaID FROM categories_coins_list where Category = '"+thisCategory+"' ";
