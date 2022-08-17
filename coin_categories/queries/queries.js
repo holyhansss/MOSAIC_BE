@@ -12,21 +12,6 @@ const allCategories =
     [["Culture & Entertainment"] , []],
     // [["Digitization"], []]
 ]
-//Insert data to table
-export const insert_to_db_table = async (tableName, valuesList) => {
-    let sql = 'INSERT INTO `' + tableName + '` VALUES ?';
-    
-    const connection = await mysql.createConnection
-    ({
-      host: MY_HOST,
-      user: MY_USERNAME,
-      password: MY_PASSWORD,
-      database : MY_DATABASE,
-  });
-    const [rows, fields] = await connection.query(sql, [valuesList]);
-    console.log("end query insert_to_db_table() for tableName "+tableName);
-    return rows;
-}
 
 export const get_category_data_1d = async (req, res) => {
     console.log("Categories to show 1y:", req.query.categoryArray);
