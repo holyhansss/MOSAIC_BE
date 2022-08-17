@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 import {MY_HOST, MY_USERNAME, MY_PASSWORD, MY_DATABASE} from "../../config/database.js";
 import {getHistoricalData} from "../api.js"
-import {get_364days_before} from "../date_formatter.js"
+import {get_364days_before, get_24_hourly_time_list, getYesterdaySecondPlusMin} from "../date_formatter.js"
 import {get_coins_specific_category} from "./queries.js"
 
 let categories = 
@@ -13,9 +13,8 @@ let categories =
     "Culture & Entertainment"
 ]
 
-
 export const create_coindesk_table = async () => {
-  let sql = "CREATE TABLE IF NOT EXISTS coindesk_coins_list(CoinSymbol varchar(10), CoinName varchar(50), Category varchar(30), CONSTRAINT PRIMARY KEY (CoinSymbol, CoinName))"
+  let sql = "CREATE TABLE IF NOT EXISTS coindesk_coins_list(CoinSymbol varchar(10), CoinName varchar(50), Category varchar(30), IgnoreThis INT DEFAULT 0, CONSTRAINT PRIMARY KEY (CoinSymbol, CoinName))"
   const connection = await mysql.createConnection
       ({
           host: MY_HOST,
@@ -26,6 +25,30 @@ export const create_coindesk_table = async () => {
     const [rows, fields] = await connection.execute(sql);
     console.log("end query create_coindesk_table()");
     return rows;
+}
+
+export const ignore_stablecoins = async (stableCoinList) => {
+  let createSql = "CREATE TEMPORARY TABLE stable_coins_list(CoinSymbol varchar(10), CoinName varchar(50), CONSTRAINT PRIMARY KEY (CoinSymbol, CoinName))";
+  let insertSql = 'INSERT INTO stable_coins_list VALUES ?';
+  let ignoreStableCoinsSql = "UPDATE coindesk_coins_list INNER JOIN stable_coins_list ON coindesk_coins_list.CoinSymbol = stable_coins_list.CoinSymbol SET IgnoreThis=1"
+
+  const connection = await mysql.createConnection
+      ({
+          host: MY_HOST,
+          user: MY_USERNAME,
+          password: MY_PASSWORD,
+          database : MY_DATABASE,
+      });
+      try {
+        await connection.execute(createSql);
+        await connection.query(insertSql, [stableCoinList]);
+        await connection.query(ignoreStableCoinsSql);    
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
+    console.log("end query ignore_stablecoins()");
+    return true;
 }
 
 
@@ -45,7 +68,8 @@ export const create_categories_coins_list = async () => {
   }
 
 
-export const create_temporary_tables_for_category = async () => {
+
+  export const create_temporary_tables_for_category = async () => {
   let sql = "CREATE TEMPORARY TABLE categories_coins_list (CoinSymbol varchar(10), CoinName varchar(50), CoinPapricaID varchar(50), Category varchar(30), CoinRank int, CONSTRAINT PRIMARY KEY (CoinSymbol, CoinName))"
   const connection = await mysql.createConnection
     ({
@@ -55,7 +79,7 @@ export const create_temporary_tables_for_category = async () => {
         database : MY_DATABASE,
     });
   const [rows, fields] = await connection.execute(sql);
-  console.log("end query create_categories_coins_list()");
+  console.log("end query create_temporary_tables_for_category()");
   return rows;
 }
 
@@ -96,7 +120,7 @@ export const insert_dates = async (tableName, columnName, startDate, endDate) =>
 }
 
 
-const insert_time_data_hourly = async (categoryName) => {
+export const insert_time_data_hourly = async (categoryName) => {
   const tableName = categoryName + '_prices_hourly';
   try {
       const connection = await mysql.createConnection
@@ -112,12 +136,12 @@ const insert_time_data_hourly = async (categoryName) => {
       console.log(sql);
       console.log(timeList);
       const [rows, fields] = await connection.query(sql, [timeList]);
-      console.log("end query insert_time_data_hourly()");        
-      return true
   } catch (error) {
       console.log(error);
       return false
   }    
+  console.log("end query insert_time_data_hourly()");        
+  return true
 }
 
 
@@ -125,9 +149,9 @@ export const create_category_history_daily_or_hourly = async (categoryName, dail
   //Creates category table with date, each coin's price, and isNull to show if price data is null
   let tableName;
   if (dailyOrHourly == "daily") {
-    tableName = categoryName + "_prices_hourly"
-  } else if (dailyOrHourly == "hourly") {
     tableName = categoryName + "_prices"
+  } else if (dailyOrHourly == "hourly") {
+    tableName = categoryName + "_prices_hourly"
   } else {
     console.error("Illegal dailyOrHourly value");
     return false;
@@ -142,7 +166,7 @@ export const create_category_history_daily_or_hourly = async (categoryName, dail
     user: MY_USERNAME,
     password: MY_PASSWORD,
     database : MY_DATABASE,
-});
+  });
 
   const [categoryCoinsRows, categoryCoinsFields] = await connection.execute(findSymbolOfCategoryCoinsSQL);
   for (let i=0; i<categoryCoinsRows.length; i++) {
@@ -265,7 +289,6 @@ export const insert_category_history_hourly = async (categoryName) => {
                 FROM `temp_table_hourly_"+coinSymbol+"` A \
                 WHERE A.Date = T.Date)"
   
-        console.log(sql);
         const [categoryCoinsRows, categoryCoinsFields] = await connection.query(sql);
         // const sqlVer = "select * from `"+tableName+"`";
         // const [r, s] = await connection.query(sqlVer);
@@ -273,14 +296,15 @@ export const insert_category_history_hourly = async (categoryName) => {
     }
     console.log("end query insert_category_history_hourly()");  
   } catch (error) {
-    console.error();
+    console.log("error caught in insert_category_history_hourly()");
+    console.error(error);
     return false
   }
   return true
 }
 
 
-const nullValueCategory = async (categoryName, dailyOrHourly) => {
+export const nullValueCategory = async (categoryName, dailyOrHourly) => {
   //This function checks if there are any Null values in price values of 
   //category tables and replace the null values with their previous values.
   //If the first price is null, replace to the nearest next not null price value
@@ -307,7 +331,12 @@ const nullValueCategory = async (categoryName, dailyOrHourly) => {
     const currCoin = coinList[i].CoinSymbol; 
     const isNullCurrCoin = "isNull" + currCoin; // there is a column that shows if a certain coin's price value is null ex) BTC =>  isNullBTC
 
-    const sqlGetPrices = "Select DATE_FORMAT(Date, '%Y-%m-%d') as Date, `"+ currCoin +"`, `"+ isNullCurrCoin +"` from `"+tableName+"` order by Date";
+  let sqlGetPrices ;
+  if (dailyOrHourly == "daily")
+    sqlGetPrices = "Select DATE_FORMAT(Date, '%Y-%m-%d') as Date, `"+ currCoin +"`, `"+ isNullCurrCoin +"` from `"+tableName+"` order by Date";
+  else if (dailyOrHourly == "hourly")
+    sqlGetPrices = "Select Date, `"+ currCoin +"`, `"+ isNullCurrCoin +"` from `"+tableName+"` order by Date";
+
     const [res, field] = await connection.query(sqlGetPrices);
     console.log(res);
     if (res[0][currCoin] == null){ 
@@ -334,7 +363,8 @@ const nullValueCategory = async (categoryName, dailyOrHourly) => {
     console.log(arryToInsert);
 
     const temporaryTable = "temp_table_" + currCoin;
-    const sqlCreateTemp = "CREATE Temporary TABLE `"+temporaryTable+"` (Date DATE, `"+currCoin+"` decimal(20, 6), `"+isNullCurrCoin+"` INT default 0);"    
+    const sqlCreateTemp = "CREATE Temporary TABLE `"+temporaryTable+"` (Date varchar(30), `"+currCoin+"` decimal(20, 6), `"+isNullCurrCoin+"` INT default 0);"    
+
     console.log(sqlCreateTemp);
     await connection.query(sqlCreateTemp);
     const sqlInsertTemp = 'INSERT INTO `' + temporaryTable + '` VALUES ?';

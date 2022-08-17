@@ -28,6 +28,28 @@ export const insert_to_db_table = async (tableName, valuesList) => {
     return rows;
 }
 
+export const insert_to_db_columns = async (tableName, columnList, valuesList) => {
+    let sql = 'INSERT INTO `' + tableName + '` (';
+    for (let i=0; i<columnList.length; i++) {
+        sql = sql + columnList[i];
+        if (i + 1 < columnList.length) {
+            sql= sql + ', '
+        }
+    }
+    sql = sql + ') VALUES ?'
+
+    const connection = await mysql.createConnection
+    ({
+      host: MY_HOST,
+      user: MY_USERNAME,
+      password: MY_PASSWORD,
+      database : MY_DATABASE,
+  });
+    const [rows, fields] = await connection.query(sql, [valuesList]);
+    console.log("end query insert_to_db_columns() for tableName "+tableName);
+    return rows;
+}
+
 export const get_category_data_1d = async (req, res) => {
     console.log("Categories to show 1y:", req.query.categoryArray);
     const categoriesToShowArray = req.query.categoryArray; 
