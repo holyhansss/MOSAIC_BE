@@ -13,6 +13,22 @@ const allCategories =
     // [["Digitization"], []]
 ]
 
+export const insert_to_db_table = async (tableName, columnList, valuesList) => {
+    let sql = 'INSERT INTO `' + tableName + '` VALUES ?'
+
+    const connection = await mysql.createConnection
+    ({
+      host: MY_HOST,
+      user: MY_USERNAME,
+      password: MY_PASSWORD,
+      database : MY_DATABASE,
+  });
+    const [rows, fields] = await connection.query(sql,]);
+    console.log("end query insert_to_db_table() for tableName "+tableName);
+    return rows;
+}
+
+
 export const insert_to_db_columns = async (tableName, columnList, valuesList) => {
     let sql = 'INSERT INTO `' + tableName + '` (';
     for (let i=0; i<columnList.length; i++) {

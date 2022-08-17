@@ -1,6 +1,5 @@
 import axios from "axios";
-import moment from 'moment';
-import {COIN_API_KEY} from "../config/database2.js";
+import {COIN_API_KEY} from "../config/database.js";
 
 //SNP 호출
 async function getSNP(datacall) {

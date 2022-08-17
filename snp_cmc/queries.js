@@ -1,5 +1,5 @@
 import mysql from 'mysql2/promise';
-import {MY_HOST, MY_USERNAME, MY_PASSWORD, MY_DATABASE} from "../config/database2.js";
+import {MY_HOST, MY_USERNAME, MY_PASSWORD, MY_DATABASE} from "../config/database.js";
 
 //CREATE TABLE; SNPCMC_1d
 
