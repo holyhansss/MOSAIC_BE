@@ -13,7 +13,7 @@ const allCategories =
     // [["Digitization"], []]
 ]
 
-export const insert_to_db_table = async (tableName, columnList, valuesList) => {
+export const insert_to_db_table = async (tableName, valuesList) => {
     let sql = 'INSERT INTO `' + tableName + '` VALUES ?'
 
     const connection = await mysql.createConnection
@@ -23,7 +23,7 @@ export const insert_to_db_table = async (tableName, columnList, valuesList) => {
       password: MY_PASSWORD,
       database : MY_DATABASE,
   });
-    const [rows, fields] = await connection.query(sql,]);
+    const [rows, fields] = await connection.query(sql, [valuesList]);
     console.log("end query insert_to_db_table() for tableName "+tableName);
     return rows;
 }
