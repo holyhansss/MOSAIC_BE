@@ -23,7 +23,7 @@ export const insert_to_db_table = async (tableName, columnList, valuesList) => {
       password: MY_PASSWORD,
       database : MY_DATABASE,
   });
-    const [rows, fields] = await connection.query(sql,]);
+    const [rows, fields] = await connection.query(sql);
     console.log("end query insert_to_db_table() for tableName "+tableName);
     return rows;
 }
