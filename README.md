@@ -28,4 +28,4 @@ retrieves and sends data for categories and snp&cmc graph
 2. await create_SNPCMC_1mo(); or await create_SNPCMC_1year();  주석 풀고 해당 함수 호출
 3. Run node control.js
 4. 실행 후 주석처리 (밑에 실행함수도 주석처리)
-5. Run node init.js 
+5. Run node init.js 하고 그래프뜨는 지 보기 
