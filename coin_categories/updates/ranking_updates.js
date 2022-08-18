@@ -5,34 +5,38 @@ import { get_categories_coins_sorted_by_rank, get_coindesk_coins } from "../quer
 export const rankingUpdates = async () => {
     const currentCoins = await getDataFromCoinpaprica();
     const oldCategoryCoins = await get_categories_coins_sorted_by_rank();
-    const updatedCoindeskList = await getUntillLowestRankingCoindeskCoin(currentCoins, oldCategoryCoins);
-    // console.log("There are " + (updatedCoindeskList.length - 50) + " new coins in categories coins");
-    const indexNotInCategory = await getIndexListNotInCategory(oldCategoryCoins, updatedCoindeskList);
+    const currentCoinsSliced = await getUntillLowestRankingCoindeskCoin(currentCoins, oldCategoryCoins);
     const coindeskCoins = await get_coindesk_coins();
-    const newCoinsToAdd = await getCoinsToAssignCategory(indexNotInCategory, coindeskCoins);
+    const newCoinsToAdd = await getCoinsToAssignCategory(currentCoinsSliced, coindeskCoins);
 
+    console.log("Coins to add to coindesklist: ");
+    console.log(newCoinsToAdd[1]);
+    for (let i=0; i<newCoinsToAdd.length; i++) {
+        console.log(newCoinsToAdd[i].symbol + " / " + newCoinsToAdd[i].name);
+    }
+    return newCoinsToAdd;
 }
 
-const getIndexListNotInCategory = (oldCoinsList, updatedCoinsList) => {
-    let list = []
-    let missingRanks = 0; // looop through the oldCoinsList and add ranks that are not in the oldCoinsList[i].CoinsRank
-    let x = -1;
-    for (let i=0; i<oldCoinsList.length; i++){
-        while (true) {
-            missingRanks ++;
-            if (oldCoinsList[i].CoinRank > missingRanks) {
-                list.push(missingRanks);
-            } else {
+const getCoinsToAssignCategory = (currentCoinsSliced, coindeskCoins) => {
+    let coinWasFound = 0;
+    let list = [];
+    for (let i=0; i<currentCoinsSliced.length; i++) {
+        for (let j=0; j<coindeskCoins.length; j++) {
+            if (currentCoinsSliced[i].symbol == coindeskCoins[j].CoinSymbol) {
+                coinWasFound = 1;
                 break;
             }
         }
+        if (coinWasFound == 0){
+            list.push(
+                currentCoinsSliced[i]
+            )
+        }
+        coinWasFound = 0;
     }
-    console.log("missing ranks list: ", list);
+    return list;
 }
 
-const getCoinsToAssignCategory = (indexesToCheck, listToCheckWith) => {
-    
-}
 
 const getUntillLowestRankingCoindeskCoin = async (current_coin_marketcap_list, categoryCoins) => {
 
@@ -55,7 +59,9 @@ const getUntillLowestRankingCoindeskCoin = async (current_coin_marketcap_list, c
         console.log("lowestRank cannot be 0");
         return;
     }
-    const arrayToReturn = current_coin_marketcap_list.slice(lowestRankIndex+1)
+    console.log("lowestRankIndex: "+ lowestRankIndex);
+
+    const arrayToReturn = current_coin_marketcap_list.slice(0, lowestRankIndex+1)
     return arrayToReturn;
   }
 
