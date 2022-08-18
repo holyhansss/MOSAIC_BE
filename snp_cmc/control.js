@@ -68,6 +68,7 @@ export const get_snpcmc_data_1d = async (req, res) => {
 
 //1개월 SNPCMC 데이터 불러오는 함수
 export const get_snpcmc_data_1mo = async (req, res) => {
+    update_queries_1mo()
     let data_1mo=[]
     try {    
         
@@ -81,6 +82,7 @@ export const get_snpcmc_data_1mo = async (req, res) => {
 }
 //1년 SNPCMC 데이터 불러오는 함수
 export const get_snpcmc_data_1yr = async (req, res) => {
+    update_queries_1yr()
     let data_1yr=[]
     try {
         
@@ -92,6 +94,87 @@ export const get_snpcmc_data_1yr = async (req, res) => {
         res.json({ message: error.message });        
     }
 }
+
+// 자동화 함수 : 1yr
+export const update_queries_1yr = async (req, res) => {
+    let data_1yr=[]
+    let last=[];
+    let now_timestamp=0;
+    let value=0;
+
+    try {
+        
+         data_1yr = await select_data("SNPCMC_1y") //쿼리 선택 후 불러오기
+         console.log("try succeeded");
+         last= data_1yr.pop(); //가장 최근 데이터 값
+    } catch (error) {
+        console.log(error);
+        res.json({ message: error.message });        
+    }
+
+    now_timestamp= (Date.now() / 1000) | 0; 
+    value= Math.abs(last.Time-now_timestamp );
+
+
+    if (value>=86400){
+        await delete_data("SNPCMC_1y")
+        let update_data_1y=[]; //쿼리에 최종적으로 들어가기 위한 데이터
+        let data_1y=[];
+        data_1y=await getData1y(); //API 데이터 불러오기
+        for (let i=0; i<data_1y.length; i++){
+            update_data_1y.push([
+                data_1y[i].time,
+                data_1y[i].SnP,
+                data_1y[i].CMC]
+            )
+        }
+        await insert_to_db_table("SNPCMC_1y",update_data_1y); //쿼리에 데이터 넣기
+
+    }else if (value<86400){
+        console.log("No Update")
+    }
+}
+
+// 자동화 함수 : 1yr
+export const update_queries_1mo = async (req, res) => {
+    let data_1mo=[]
+    let last=[];
+    let now_timestamp=0;
+    let value=0;
+
+    try {
+        
+         data_1mo = await select_data("SNPCMC_1mo") //쿼리 선택 후 불러오기
+         console.log("try succeeded");
+         last= data_1mo.pop(); //가장 최근 데이터 값
+    } catch (error) {
+        console.log(error);
+        res.json({ message: error.message });        
+    }
+
+    now_timestamp= (Date.now() / 1000) | 0; 
+    value= Math.abs(last.Time-now_timestamp );
+
+
+    if (value>=86400){
+        await delete_data("SNPCMC_1mo")
+        let update_data_1mo=[]; //쿼리에 최종적으로 들어가기 위한 데이터
+        let data_1mo=[];
+        data_1mo=await getData1mo(); //API 데이터 불러오기
+        for (let i=0; i<data_1mo.length; i++){
+            update_data_1mo.push([
+                data_1mo[i].time,
+                data_1mo[i].SnP,
+                data_1mo[i].CMC]
+            )
+        }
+        await insert_to_db_table("SNPCMC_1mo",update_data_1mo); //쿼리에 데이터 넣기
+
+    }else if (value<86400){
+        console.log("No Update")
+    }
+}
+
 
 //실행 함수
 //control_queries_1d();
