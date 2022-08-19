@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 import {MY_HOST, MY_USERNAME, MY_PASSWORD, MY_DATABASE} from "../../config/database.js";
 import {getHistoricalData} from "../api.js"
-import {get_364days_before, get_24_hourly_time_list, getYesterdaySecondPlusMin} from "../date_formatter.js"
+import {get_364days_before, get_24_hourly_time_list, getYesterdaySecondPlusMin, getToday} from "../date_formatter.js"
 import {get_coins_specific_category} from "./queries.js"
 
 let categories = 
@@ -51,7 +51,6 @@ export const ignore_stablecoins = async (stableCoinList) => {
     return true;
 }
 
-
 //Create categories coins list
 export const create_categories_coins_list = async () => {
     let sql = "CREATE TABLE IF NOT EXISTS categories_coins_list (CoinSymbol varchar(10), CoinName varchar(50), CoinPapricaID varchar(50), Category varchar(30), CoinRank int, CONSTRAINT PRIMARY KEY (CoinSymbol, CoinName))"
@@ -82,7 +81,6 @@ export const create_categories_coins_list = async () => {
   console.log("end query create_temporary_tables_for_category()");
   return rows;
 }
-
 
 export const insert_dates = async (tableName, columnName, startDate, endDate) => {
   let subSql = 
@@ -119,7 +117,6 @@ export const insert_dates = async (tableName, columnName, startDate, endDate) =>
     }
 }
 
-
 export const insert_time_data_hourly = async (categoryName) => {
   const tableName = categoryName + '_prices_hourly';
   try {
@@ -143,7 +140,6 @@ export const insert_time_data_hourly = async (categoryName) => {
   console.log("end query insert_time_data_hourly()");        
   return true
 }
-
 
 export const create_category_history_daily_or_hourly = async (categoryName, dailyOrHourly) => {
   //Creates category table with date, each coin's price, and isNull to show if price data is null
@@ -303,7 +299,6 @@ export const insert_category_history_hourly = async (categoryName) => {
   return true
 }
 
-
 export const nullValueCategory = async (categoryName, dailyOrHourly) => {
   //This function checks if there are any Null values in price values of 
   //category tables and replace the null values with their previous values.
@@ -396,6 +391,173 @@ export const nullValueCategory = async (categoryName, dailyOrHourly) => {
   }
 }
 
+export const create_categories_graph_data_table_daily_or_hourly = async (dailyOrHourly) => {
+  let sql; 
+  if (dailyOrHourly == "1y" || dailyOrHourly == "1mo") 
+    sql ="CREATE TABLE IF NOT EXISTS Categories_graph_data_daily (Date varchar(30)";
+  else if (dailyOrHourly == "1d")
+  sql ="CREATE TABLE IF NOT EXISTS Categories_graph_data_hourly (Date varchar(30)";
+  
+  for (let i=0; i<categories.length; i++) {
+    sql = sql + ", `" + categories[i] + "` decimal(20,6)"
+  }
+  sql = sql + ", CONSTRAINT PRIMARY KEY (Date))"
+  const connection = await mysql.createConnection
+      ({
+          host: MY_HOST,
+          user: MY_USERNAME,
+          password: MY_PASSWORD,
+          database : MY_DATABASE,
+      });
+    try {
+      await connection.execute(sql);        
+    } catch (error) {
+      console.error(error);
+      return false
+    }
+    console.log("end query create_categories_graph_data_table_daily_or_hourly()");
+    console.log(sql);
+    return true;
+}
 
 
+export const insert_calculated_prices_daily = async (categories, dateRange) => {
+  const firstCategoryName = categories[0][0] + "_prices";
+  let sql = "insert into Categories_graph_data_daily select DATE_FORMAT(`" + firstCategoryName + "`.date, '%Y-%m-%d') as time ";
+  let sqlJoinTableList = "from `" + firstCategoryName + "`";
+  for (let i=0; i<categories.length; i++) {
+      const categoryTableName = categories[i][0] + "_prices"
+      if (i > 0){
+          sqlJoinTableList = sqlJoinTableList + " join `"+ categoryTableName +"` on `"+ firstCategoryName +"`.date = `"+ categoryTableName +"`.date";
+      }
+      const sqlToMerge = await sql_to_merge_category(categoryTableName, categories[i][1])
+      sql = sql + sqlToMerge;
+  }
+  sql = sql + sqlJoinTableList;
+  const today = await getToday();
+  if (dateRange == "1y") {
+      console.log("dateRange == 1y");
+      sql = sql + " where `"+firstCategoryName+"`.date between DATE_ADD(DATE_ADD('"+ today +"', INTERVAL 1 DAY), INTERVAL -1 YEAR) and '"+ today + "' ";
+  } else if (dateRange == "1mo"){
+      console.log("dateRange == 1mo");
+      sql = sql + " where `"+firstCategoryName+"`.date between DATE_ADD('"+ today +"', INTERVAL -1 MONTH) and '"+ today + "' ";
+  } else {
+      console.error("invalid date range in return_calculated_prices_daily");
+  }
+  const connection = await mysql.createConnection
+  ({
+      host: MY_HOST,
+      user: MY_USERNAME,
+      password: MY_PASSWORD,
+      database : MY_DATABASE,
+  });
+  const [rows, fields] = await connection.execute(sql);
+  console.log("end query return_calculated_prices_daily()");
+  console.log(sql);
+  return rows;
+}
 
+
+const sql_to_merge_category = (tableName, coinList) => {
+  let sqlToMerge = ", round( ";
+  let categoryNameToReturn = tableName.slice(0, -7)
+  const coinNum = coinList.length;
+  const today = getToday();
+  const queryUTCBefore1Month = "DATE_ADD('"+ today +"', INTERVAL -1 MONTH)"
+  const queryUTCBefore364days = "DATE_ADD(DATE_ADD('"+ today +"', INTERVAL 1 DAY), INTERVAL -1 YEAR)"
+
+  for (let i=0; i<coinNum; i++) {
+      if (i==0) {
+          sqlToMerge = sqlToMerge + "IFNULL ((`"+coinList[i]+"` * 100 / (select `"+coinList[i]+"` from `"+tableName+"` LIMIT 0,1) / "+coinNum+"), 0)";
+      } else {
+          sqlToMerge = sqlToMerge + " + IFNULL ((`"+coinList[i]+"` * 100 / (select `"+coinList[i]+"` from `"+tableName+"` LIMIT 0,1) / "+coinNum+"), 0)";
+
+      }
+  }
+  sqlToMerge = sqlToMerge + ", 1) as `"+ categoryNameToReturn+"` ";
+  return sqlToMerge
+}
+
+export const insert_calculated_prices_hourly = async (categories, dateRange) => {
+  const firstCategoryName = categories[0][0] + "_prices_hourly";
+  // CONVERT_TZ(`" + firstCategoryName + "`.date,'+00:00','+09:00')
+  // let sql = "select DATE_FORMAT(`" + firstCategoryName + "`.date, '%d' '%h') as time ";
+  let sql = "insert into Categories_graph_data_hourly select DATE_FORMAT(  CONVERT_TZ(`" + firstCategoryName + "`.date,'+00:00','+09:00') , '%h') as time ";
+  let sqlJoinTableList = "from `" + firstCategoryName + "`";
+  for (let i=0; i<categories.length; i++) {
+      const categoryTableName = categories[i][0] + "_prices_hourly"
+      if (i > 0){
+          sqlJoinTableList = sqlJoinTableList + " join `"+ categoryTableName +"` on `"+ firstCategoryName +"`.date = `"+ categoryTableName +"`.date";
+      }
+      const sqlToMerge = await sql_to_merge_category_1d(categoryTableName, categories[i][1])
+      sql = sql + sqlToMerge;
+      }
+      sql = sql + sqlJoinTableList;
+      const today = getToday();
+      const queryUTCNow = "utc_timestamp()";
+      // const queryUTCBefore23 = "DATE_FORMAT(DATE_ADD(utc_timestamp(), INTERVAL -23 HOUR), '%Y-%m-%dT%TZ')"
+      const queryUTCBefore23 = "DATE_FORMAT(DATE_ADD(utc_timestamp(), INTERVAL -50 HOUR), '%Y-%m-%dT%TZ')"
+  if (dateRange == "1d") {
+      sql = sql + " where `"+firstCategoryName+"`.date between " + queryUTCBefore23 +" and "+ queryUTCNow ;
+  } else {
+      console.error("invalid date range in return_calculated_prices");
+      }
+  const connection = await mysql.createConnection
+  ({
+      host: MY_HOST,
+      user: MY_USERNAME,
+      password: MY_PASSWORD,
+      database : MY_DATABASE,
+  });
+
+  const [rows, fields] = await connection.execute(sql);
+  console.log("end query return_calculated_prices()");
+  return rows;
+}
+
+const sql_to_merge_category_1d = (tableName, coinList) => {
+  let sqlToMerge = ", round( ";
+  let categoryNameToReturn = tableName.slice(0, -14)
+  const coinNum = coinList.length;
+  // const queryUTCBefore23h = "DATE_FORMAT(DATE_ADD(utc_timestamp(), INTERVAL -23 HOUR), '%Y-%m-%dT%TZ')"
+  const queryUTCBefore23h = "DATE_FORMAT(DATE_ADD(utc_timestamp(), INTERVAL -50 HOUR), '%Y-%m-%dT%TZ')"
+
+  for (let i=0; i<coinNum; i++) {
+      if (i==0) {
+          sqlToMerge = sqlToMerge + "IFNULL ((`"+coinList[i]+"` * 100 / (select `"+coinList[i]+"` from `"+tableName+"` d where d.date > "+queryUTCBefore23h+" LIMIT 0,1) / "+coinNum+"), 0)";
+      } else {
+          sqlToMerge = sqlToMerge + " + IFNULL ((`"+coinList[i]+"` * 100 / (select `"+coinList[i]+"` from `"+tableName+"` d where d.date > "+queryUTCBefore23h+" LIMIT 0,1) / "+coinNum+"), 0)";
+      }
+  }
+  sqlToMerge = sqlToMerge + ", 1) as `"+ categoryNameToReturn+"` ";
+  return sqlToMerge
+}
+
+export const createGraphDataMinMaxYearlyOrMonthlyOrDaily = async (yearlyOrMonthlyOrDaily) => {
+  let sql ;
+  if (yearlyOrMonthlyOrDaily == "1y")
+    sql = "create table min_max_1y (min decimal(20,6), max decimal(20,6))";
+  else if  (yearlyOrMonthlyOrDaily == "1mo")
+    sql = "create table min_max_1mo (min decimal(20,6), max decimal(20,6))";
+  else if  (yearlyOrMonthlyOrDaily == "1d")
+    sql = "create table min_max_1d (min decimal(20,6), max decimal(20,6))";
+  else 
+    console.error("invalid yearlyOrMonthlyOrDaily value in createGraphDataMinMaxYearlyOrMonthlyOrDaily()");
+
+  const connection = await mysql.createConnection
+  ({
+      host: MY_HOST,
+      user: MY_USERNAME,
+      password: MY_PASSWORD,
+      database : MY_DATABASE,
+  });
+  try {
+    const [rows, fields] = await connection.execute(sql);
+  } catch (error) {
+    console.error(error);
+    console.error("createGraphDataMinMax failed");
+    return false
+  }
+  console.log("end query createGraphDataMinMax()");
+  return true;
+}
