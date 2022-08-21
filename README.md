@@ -24,8 +24,9 @@ retrieves and sends data for categories and snp&cmc graph
 
 * 테이블 생성및 관리 
 0. 데이터 베이스 생성 후 계정 정보를 config 파일 안에 database2.js 파일을 만들어 저장 -> 생성한 데이터 베이스 use 명령어 실행 (musql)
-1. Go to "snp_cmc"
-2. await create_SNPCMC_1mo(); or await create_SNPCMC_1year();  주석 풀고 해당 함수 호출
+1. Go to "snp_cmc/control.js"
+2. control_queries_1mo 에서 "await create_SNPCMC_1mo();"
+/  control_queries_1y 에서 "await create_SNPCMC_1y();"  주석들 풀고 해당 함수 호출
 3. Run node control.js
 4. 실행 후 주석처리 (밑에 실행함수도 주석처리)
-5. Run node init.js 하고 그래프뜨는 지 보기 
+5. Run node index.js 하고 MOSAIC_FE 파일가서 실행 후 그래프 뜨는 지 보기 
