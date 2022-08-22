@@ -68,7 +68,6 @@ export const get_snpcmc_data_1d = async (req, res) => {
 
 //1개월 SNPCMC 데이터 불러오는 함수
 export const get_snpcmc_data_1mo = async (req, res) => {
-    update_queries_1mo()
     let data_1mo=[]
     try {    
         
@@ -82,7 +81,6 @@ export const get_snpcmc_data_1mo = async (req, res) => {
 }
 //1년 SNPCMC 데이터 불러오는 함수
 export const get_snpcmc_data_1yr = async (req, res) => {
-    update_queries_1yr()
     let data_1yr=[]
     try {
         
