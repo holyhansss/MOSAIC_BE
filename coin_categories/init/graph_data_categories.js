@@ -37,7 +37,7 @@ export const InsertCategoryGraphDataDailyORHourly = async (dailyOrHourly) => {
             const thisCategoryCoins = await get_coins_specific_category(allCategories[i][0]); 
             //카테고리 해당되는 코인들 삽입
             for (let j=0; j<thisCategoryCoins.length; j++) {
-              console.log(thisCategoryCoins[j].CoinSymbol);
+              // console.log(thisCategoryCoins[j].CoinSymbol);
               allCategories[i][1].push(thisCategoryCoins[j].CoinSymbol)
             }
         }
