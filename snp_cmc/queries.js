@@ -4,7 +4,7 @@ import {MY_HOST, MY_USERNAME, MY_PASSWORD, MY_DATABASE2} from "../config/databas
 //CREATE TABLE; SNPCMC_1d
 
 export const create_SNPCMC_1d = async () => {
-  let sql = "CREATE TABLE SNPCMC_1d ( Time varchar(10), SNP varchar(50), CMC varchar(50))"
+  let sql = "CREATE TABLE snpcmc_1d ( Time varchar(10), SNP varchar(50), CMC varchar(50))"
   const connection = await mysql.createConnection
     ({
         host: MY_HOST,
@@ -19,7 +19,7 @@ export const create_SNPCMC_1d = async () => {
 //CREATE TABLE; SNPCMC_1mo
 
 export const create_SNPCMC_1mo = async () => {
-  let sql = "CREATE TABLE SNPCMC_1mo ( Time varchar(10), SNP varchar(50), CMC varchar(50))"
+  let sql = "CREATE TABLE snpcmc_1mo ( Time varchar(10), SNP varchar(50), CMC varchar(50))"
   const connection = await mysql.createConnection
     ({
         host: MY_HOST,
@@ -33,7 +33,7 @@ export const create_SNPCMC_1mo = async () => {
 
 //CREATE TABLE; SNPCMC_1y
 export const create_SNPCMC_1y = async () => {
-    let sql = "CREATE TABLE SNPCMC_1y ( Time varchar(10), SNP varchar(50), CMC varchar(50))"
+    let sql = "CREATE TABLE snpcmc_1y ( Time varchar(10), SNP varchar(50), CMC varchar(50))"
     const connection = await mysql.createConnection
       ({
           host: MY_HOST,
