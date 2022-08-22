@@ -404,16 +404,16 @@ export const create_categories_graph_data_table_daily_or_hourly = async (dailyOr
 }
 
 
-export const insert_calculated_prices_daily = async (categories, dateRange) => {
-  const firstCategoryName = allCategories[0][0] + "_prices";
+export const insert_calculated_prices_daily = async (categoriesWithCoins, dateRange) => {
+  const firstCategoryName = categoriesWithCoins[0][0] + "_prices";
   let sql = "insert into Categories_graph_data_daily select DATE_FORMAT(`" + firstCategoryName + "`.date, '%Y-%m-%d') as time ";
   let sqlJoinTableList = "from `" + firstCategoryName + "`";
-  for (let i=0; i<allCategories.length; i++) {
-      const categoryTableName = allCategories[i][0] + "_prices"
+  for (let i=0; i<categoriesWithCoins.length; i++) {
+      const categoryTableName = categoriesWithCoins[i][0] + "_prices"
       if (i > 0){
           sqlJoinTableList = sqlJoinTableList + " join `"+ categoryTableName +"` on `"+ firstCategoryName +"`.date = `"+ categoryTableName +"`.date";
       }
-      const sqlToMerge = await sql_to_merge_category(categoryTableName, allCategories[i][1])
+      const sqlToMerge = await sql_to_merge_category(categoryTableName, categoriesWithCoins[i][1])
       sql = sql + sqlToMerge;
   }
   sql = sql + sqlJoinTableList;
@@ -460,18 +460,18 @@ const sql_to_merge_category = (tableName, coinList) => {
   return sqlToMerge
 }
 
-export const insert_calculated_prices_hourly = async (categories, dateRange) => {
-  const firstCategoryName = allCategories[0][0] + "_prices_hourly";
+export const insert_calculated_prices_hourly = async (categoriesWithCoins, dateRange) => {
+  const firstCategoryName = categoriesWithCoins[0][0] + "_prices_hourly";
   // CONVERT_TZ(`" + firstCategoryName + "`.date,'+00:00','+09:00')
   // let sql = "select DATE_FORMAT(`" + firstCategoryName + "`.date, '%d' '%h') as time ";
   let sql = "insert into Categories_graph_data_hourly select DATE_FORMAT(  CONVERT_TZ(`" + firstCategoryName + "`.date,'+00:00','+09:00') , '%h') as time ";
   let sqlJoinTableList = "from `" + firstCategoryName + "`";
-  for (let i=0; i<categories.length; i++) {
-      const categoryTableName = allCategories[i][0] + "_prices_hourly"
+  for (let i=0; i<categoriesWithCoins.length; i++) {
+      const categoryTableName = categoriesWithCoins[i][0] + "_prices_hourly"
       if (i > 0){
           sqlJoinTableList = sqlJoinTableList + " join `"+ categoryTableName +"` on `"+ firstCategoryName +"`.date = `"+ categoryTableName +"`.date";
       }
-      const sqlToMerge = await sql_to_merge_category_1d(categoryTableName, allCategories[i][1])
+      const sqlToMerge = await sql_to_merge_category_1d(categoryTableName, categoriesWithCoins[i][1])
       sql = sql + sqlToMerge;
       }
       sql = sql + sqlJoinTableList;
