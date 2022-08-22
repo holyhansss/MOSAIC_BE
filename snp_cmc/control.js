@@ -20,7 +20,7 @@ export const control_queries_1d = async () => {
 
 // 1개월치 데이터 호출/생성/저장
 export const control_queries_1mo = async () => {
-    //create_SNPCMC_1mo();
+    // create_SNPCMC_1mo();
     await delete_data("SNPCMC_1mo")
     let update_data_1mo=[];
     let data_1mo=[];
@@ -37,7 +37,7 @@ export const control_queries_1mo = async () => {
 
 // 1년치 데이터 호출/생성/저장
 export const control_queries_1y = async () => {
-    //create_SNPCMC_1y();
+    // create_SNPCMC_1y();
     await delete_data("SNPCMC_1y")
     let update_data_1y=[]; //쿼리에 최종적으로 들어가기 위한 데이터
     let data_1y=[];
@@ -178,5 +178,5 @@ export const update_queries_1mo = async (req, res) => {
 
 //실행 함수
 //control_queries_1d();
-//control_queries_1mo();
-//control_queries_1y();
+control_queries_1mo();
+control_queries_1y();
