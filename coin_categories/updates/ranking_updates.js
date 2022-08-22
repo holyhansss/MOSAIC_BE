@@ -8,7 +8,6 @@ export const rankingUpdates = async () => {
     const currentCoinsSliced = await getUntillLowestRankingCoindeskCoin(currentCoins, oldCategoryCoins);
     const coindeskCoins = await get_coindesk_coins();
     const newCoinsToAdd = await getCoinsToAssignCategory(currentCoinsSliced, coindeskCoins);
-
     console.log("Coins to add to coindesklist: ");
     console.log(newCoinsToAdd[1]);
     for (let i=0; i<newCoinsToAdd.length; i++) {
@@ -39,10 +38,8 @@ const getCoinsToAssignCategory = (currentCoinsSliced, coindeskCoins) => {
 
 
 const getUntillLowestRankingCoindeskCoin = async (current_coin_marketcap_list, categoryCoins) => {
-
     let lowestRank = 0 ;
     let lowestRankIndex = 0;
-  
     for (let i=0; i < categoryCoins.length; i++) {
         // Find lowest ranking coin in current coindeskCoins table
       for (let j=0; j < current_coin_marketcap_list.length; j++) {

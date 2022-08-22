@@ -5,9 +5,7 @@ import { insert_to_db_columns} from "../queries/queries.js";
 //table name categories_coins_list
 export const createAndInsertCoinDeskCoinsList = async () => {
     await create_coindesk_table();
-
     let coindesk_coins_list_insert_db = [];
-
     for (let i=0; i<coindesk_coins_list.length; i++){
         coindesk_coins_list_insert_db.push(
             [
