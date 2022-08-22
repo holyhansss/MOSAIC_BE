@@ -382,7 +382,7 @@ export const create_categories_graph_data_table_daily_or_hourly = async (dailyOr
   else if (dailyOrHourly == "1d")
   sql ="CREATE TABLE IF NOT EXISTS Categories_graph_data_hourly (Date varchar(30)";
   
-  for (let i=0; i<categories.length; i++) {
+  for (let i=0; i<allCategories.length; i++) {
     sql = sql + ", `" + allCategories[i] + "` decimal(20,6)"
   }
   sql = sql + ", CONSTRAINT PRIMARY KEY (Date))"
