@@ -3,6 +3,7 @@ import { get_categories_coins_sorted_by_rank, get_coindesk_coins } from "../quer
 
 
 export const rankingUpdates = async () => {
+    // return new coins to assign category and add to the coindesk table
     const currentCoins = await getDataFromCoinpaprica();
     const oldCategoryCoins = await get_categories_coins_sorted_by_rank();
     const currentCoinsSliced = await getUntillLowestRankingCoindeskCoin(currentCoins, oldCategoryCoins);
@@ -17,6 +18,7 @@ export const rankingUpdates = async () => {
 }
 
 const getCoinsToAssignCategory = (currentCoinsSliced, coindeskCoins) => {
+    // currentCoinsSliced list 중에 coindeskCoins list 에 없는 코인들을 return
     let coinWasFound = 0;
     let list = [];
     for (let i=0; i<currentCoinsSliced.length; i++) {
@@ -38,6 +40,7 @@ const getCoinsToAssignCategory = (currentCoinsSliced, coindeskCoins) => {
 
 
 const getUntillLowestRankingCoindeskCoin = async (current_coin_marketcap_list, categoryCoins) => {
+    //  현재 category coins list에 있는 코인중에 제일 순위가 낮은 코인을 기준부터 제일 순위가 높은 코인까지 나열한 리스트를 리턴한다
     let lowestRank = 0 ;
     let lowestRankIndex = 0;
     for (let i=0; i < categoryCoins.length; i++) {
@@ -62,4 +65,4 @@ const getUntillLowestRankingCoindeskCoin = async (current_coin_marketcap_list, c
     return arrayToReturn;
   }
 
-rankingUpdates()
+// rankingUpdates()

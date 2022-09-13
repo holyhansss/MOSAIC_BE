@@ -2,8 +2,8 @@ import {create_coindesk_table, ignore_stablecoins} from "../queries/queries_init
 import { insert_to_db_columns} from "../queries/queries.js";
 
 
-//table name categories_coins_list
 export const createAndInsertCoinDeskCoinsList = async () => {
+  // coindesk table creation and insertion
     await create_coindesk_table();
     let coindesk_coins_list_insert_db = [];
     for (let i=0; i<coindesk_coins_list.length; i++){
@@ -31,6 +31,7 @@ export const createAndInsertCoinDeskCoinsList = async () => {
 
 //createAndInsertCoinDeskCoinsList()
 
+// coindesk list에서 스테이블 코인들 리스트
 const stablecoins_list = [
   {    
       "Symbol": "USDT",
@@ -130,6 +131,7 @@ const stablecoins_list = [
 ]
 
 
+//coindesk list 처음으로 insert 할때 사용하는 리스트
 const coindesk_coins_list = [
   {
     "DACS Rank": 1,

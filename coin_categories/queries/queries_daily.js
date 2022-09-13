@@ -4,6 +4,7 @@ import {getHistoricalData} from "../api.js"
 
   
 export const daily_update_to_db_table_column = async (tableName, columnName, date, newValue) => {
+    //query to add newValue to tableName.date
     const sql = "update `"+tableName+"` set `"+columnName+"` = "+newValue+" where Date = '"+date+"'";
     const connection = await mysql.createConnection
     ({
@@ -19,6 +20,7 @@ export const daily_update_to_db_table_column = async (tableName, columnName, dat
 }
 
 export const replaceToLatestValueAndSetIsNull = async (tableName, columnName, date) => {
+    // if today's price value is null, replace it to yesterday's price value and set isNull to 1
     const sql = 
         "update `" + tableName + "` \
         set `" + columnName + "` = \

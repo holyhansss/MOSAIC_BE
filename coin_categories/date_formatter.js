@@ -1,4 +1,7 @@
+//These functions return dates or lists of dates
+
 export const getToday = () => {
+    //return utc today
     let today = new Date(new Date().setUTCDate(new Date().getUTCDate()));
     today = JSON.stringify(today)
     today = today.slice(1, -15);
@@ -7,6 +10,7 @@ export const getToday = () => {
 }
 
 export const getNDaysBefore = (nDays) => {
+    //return utc N days before
     let thisDay = new Date(new Date().setUTCDate(new Date().getUTCDate()-nDays));
     thisDay = JSON.stringify(thisDay)
     thisDay = thisDay.slice(1, -15);
@@ -15,6 +19,7 @@ export const getNDaysBefore = (nDays) => {
 }
 
 export const getYesterdaySecondPlusMin = () => {
+    //get utc date and time for 23h 59min before
     let yesterday = new Date(new Date().setUTCDate(new Date().getUTCDate()-1));
     let yesterdayMinus1Min = new Date(yesterday.getTime() + 60000);
     yesterdayMinus1Min = JSON.stringify(yesterdayMinus1Min)
@@ -24,6 +29,7 @@ export const getYesterdaySecondPlusMin = () => {
 }
 
 export const get_24_hourly_time_list = () => {
+    //get list of utc hours from now to 23 hours before
     let year = new Date().getUTCFullYear();
     let month = new Date().getUTCMonth();
     let date = new Date().getUTCDate();
@@ -41,6 +47,7 @@ export const get_24_hourly_time_list = () => {
 }
 
 export const get_364days_before = () => {
+    //get utc date for 364 days before
     let dateToReturn = new Date(new Date().setUTCDate(new Date().getUTCDate()-364));
     dateToReturn = JSON.stringify(dateToReturn)
     dateToReturn = dateToReturn.slice(1, -15);

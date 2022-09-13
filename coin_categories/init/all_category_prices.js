@@ -5,13 +5,10 @@ import {create_category_history_daily_or_hourly,
         insert_category_history_hourly,
         nullValueCategory
     } from '../queries/queries_init.js'
-// import {} from '../queries/queries.js'
 import {getToday, get_364days_before} from '../date_formatter.js'
 
 
-//TODO test
-
-let categories = 
+const allCategories = 
 [
     "Currency",                 
     "Smart Contract Platform",
@@ -21,8 +18,9 @@ let categories =
 ]
 
 export const allCategoryCoinsPricesDaily = async () => {
-    for (let i=0; i<categories.length; i++){
-        const currCategory = categories[i];
+    //create daily category coins price table for all categories and insert dates and prices
+    for (let i=0; i<allCategories.length; i++){
+        const currCategory = allCategories[i];
         try {
             const returnTrue = await create_category_history_daily_or_hourly(currCategory, "daily");
             if (returnTrue != true){
@@ -34,7 +32,7 @@ export const allCategoryCoinsPricesDaily = async () => {
             console.error("create_category_history_daily_or_hourly() failed");          
             return false;  
         }
-        let categoryTableName = categories[i] + "_prices";
+        let categoryTableName = allCategories[i] + "_prices";
         let endDate = getToday();
         let startDate = get_364days_before();
         
@@ -61,7 +59,7 @@ export const allCategoryCoinsPricesDaily = async () => {
             return false; 
         }
         try {
-            await nullValueCategory(categories[i], "daily")
+            await nullValueCategory(allCategories[i], "daily")
         } catch (error) {
             console.error(error);
             console.error("nullValueCategory() failed");
@@ -72,8 +70,9 @@ export const allCategoryCoinsPricesDaily = async () => {
 }
 
 export const allCategoryCoinsPricesHourly = async () => {
-    for (let i=0; i<categories.length; i++){
-        const currCategory = categories[i];
+    //create hourly category coins price table for all categories and insert times and prices
+    for (let i=0; i<allCategories.length; i++){
+        const currCategory = allCategories[i];
         try {
             const returnTrue = await create_category_history_daily_or_hourly(currCategory, "hourly");
             if (returnTrue != true){
@@ -85,9 +84,9 @@ export const allCategoryCoinsPricesHourly = async () => {
             console.error("create_category_history_daily_or_hourly() failed");           
             return false; 
         }
-        let categoryTableName = categories[i] + "_prices_hourly";
-        let endDate = getToday();
-        let startDate = get_364days_before();
+        // let categoryTableName = allCategories[i] + "_prices_hourly";
+        // let endDate = getToday();
+        // let startDate = get_364days_before();
 
         try {
             const returnTrue = await insert_time_data_hourly(currCategory);
@@ -112,7 +111,7 @@ export const allCategoryCoinsPricesHourly = async () => {
             return false; 
         }
         try {
-            await nullValueCategory(categories[i], "hourly")
+            await nullValueCategory(allCategories[i], "hourly")
         } catch (error) {
             console.error(error);
             console.error("nullValueCategory() failed");

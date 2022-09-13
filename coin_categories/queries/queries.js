@@ -12,7 +12,9 @@ const allCategories =
     [["Culture & Entertainment"] , []],
 ]
 
+
 export const get_category_data_1d = async (req, res) => {
+    //This function returns 1d graph data to the client server
     console.log("Categories to show 1y:", req.query.categoryArray);
     const categoriesToShowArray = req.query.categoryArray; 
     console.log("categoriesToShowArray 1y: ", categoriesToShowArray);
@@ -45,6 +47,7 @@ export const get_category_data_1d = async (req, res) => {
 }
 
 export const get_category_data_1mo = async (req, res) => {
+    //This function returns 1mo graph data to the client server
     console.log("Categories to show 1mo:", req.query.categoryArray);
     const categoriesToShowArray = req.query.categoryArray; 
     console.log("categoriesToShowArray 1mo: ", categoriesToShowArray);
@@ -56,7 +59,6 @@ export const get_category_data_1mo = async (req, res) => {
         categories.push(allCategories[i])
     }
 
-    let datesAndPrices = []
     try {
         for (let i=0; i<categories.length; i++){
             const thisCategoryCoins = await get_coins_specific_category(categories[i][0]);
@@ -78,6 +80,7 @@ export const get_category_data_1mo = async (req, res) => {
 }
 
 export const get_category_data_1yr = async (req, res) => {
+    //This function returns 1yr graph data to the client server
     console.log("Categories to show 1y:", req.query.categoryArray);
     const categoriesToShowArray = req.query.categoryArray; 
     console.log("categoriesToShowArray 1y: ", categoriesToShowArray);
@@ -88,7 +91,7 @@ export const get_category_data_1yr = async (req, res) => {
             continue;
         categories.push(allCategories[i])
     }
-    let datesAndPrices = [];
+
     try {
         for (let i=0; i<categories.length; i++){
             const thisCategoryCoins = await get_coins_specific_category(categories[i][0]);
@@ -112,6 +115,7 @@ export const get_category_data_1yr = async (req, res) => {
 
 
 export const insert_to_db_table = async (tableName, valuesList) => {
+    // query to insert valuesList into tableName
     let sql = 'INSERT INTO `' + tableName + '` VALUES ?'
     const connection = await mysql.createConnection
     ({
@@ -127,6 +131,7 @@ export const insert_to_db_table = async (tableName, valuesList) => {
 
 
 export const insert_to_db_columns = async (tableName, columnList, valuesList) => {
+    //query to insert valuesList in columnList of tableName
     let sql = 'INSERT INTO `' + tableName + '` (';
     for (let i=0; i<columnList.length; i++) {
         sql = sql + columnList[i];
@@ -148,8 +153,9 @@ export const insert_to_db_columns = async (tableName, columnList, valuesList) =>
     return rows;
 }
 
-//Insert ignore data to column of table
+
 export const insert_ignore_to_db_table_column = async (tableName, columns, valuesList) => {
+    // query to insert ignore valuesList in tableName.columns
     let sql = 'INSERT IGNORE INTO `' + tableName + "` (";
     for (let i=0; i<columns.length; i++) {
       sql = sql + columns[i];
@@ -172,6 +178,7 @@ export const insert_ignore_to_db_table_column = async (tableName, columns, value
   }
 
 export const get_coindesk_coins = async () => {
+    // query to get coindesk_coins_list
     let sql = "SELECT * from coindesk_coins_list";
     const connection = await mysql.createConnection
     ({
@@ -187,6 +194,7 @@ export const get_coindesk_coins = async () => {
   }
 
 export const get_categories_coins_sorted_by_rank = async () => {
+    // query to get categories_coins_list ordered by CoinRank
 let sql = "SELECT * from categories_coins_list order by CoinRank";
 const connection = await mysql.createConnection
 ({
@@ -203,6 +211,7 @@ return rows;
 
 
 export const get_coins_specific_category = async (thisCategory) => {
+    // query to get CoinSymbol and CoinPapricaID from categories_coins_list if Category == 'thisCategory'
     let sql = "SELECT CoinSymbol, CoinPapricaID FROM categories_coins_list where Category = '"+thisCategory+"' ";
     const connection = await mysql.createConnection
     ({
@@ -217,6 +226,8 @@ export const get_coins_specific_category = async (thisCategory) => {
   }
 
 export const return_calculated_prices = async (categories, dateRange) => {
+    // query to return graph data within dateRange from Categories_graph_data_daily or Categories_graph_data_hourly 
+    // range is 364 days if dateRange == '1y', 30 days if dateRange == '1mo', 23 hours if dateRange == '1d'
     let tableName;
     let startDate;
     let minmaxTable;
@@ -264,6 +275,8 @@ export const return_calculated_prices = async (categories, dateRange) => {
 }
 
 export const insert_min_max_1y_1mo_1d = async (yearMonthOrDay) => {
+    // query to insert min and max values in tableName 
+    // min and max to use when graph plot in client
     let startDate;
     let tableName;
     let insertToTable;
@@ -299,6 +312,7 @@ export const insert_min_max_1y_1mo_1d = async (yearMonthOrDay) => {
 }
 
 export const get_min_max_1y_1mo_1d = async (yearMonthOrDay) => {
+    // get min max values min_max_1y or min_max_1mo or min_max_1d
     let tableName;
     let sql;
     if (yearMonthOrDay=="1y"){
