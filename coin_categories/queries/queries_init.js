@@ -4,7 +4,9 @@ import {getHistoricalData} from "../api.js"
 import {get_364days_before, get_24_hourly_time_list, getYesterdaySecondPlusMin, getToday} from "../date_formatter.js"
 import {get_coins_specific_category} from "./queries.js"
 
-// let categories = 
+//The word 'daily' is similar to the words '1y' and '1mo'
+//The word 'hourly' is similar to the word '1d'
+
 let allCategories = 
 [
     "Currency",                 
@@ -15,6 +17,7 @@ let allCategories =
 ]
 
 export const create_coindesk_table = async () => {
+  //query to create coindesk_coins_list
   let sql = "CREATE TABLE IF NOT EXISTS coindesk_coins_list(CoinSymbol varchar(10), CoinName varchar(50), Category varchar(30), IgnoreThis INT DEFAULT 0, CONSTRAINT PRIMARY KEY (CoinSymbol, CoinName))"
   const connection = await mysql.createConnection
       ({
@@ -29,6 +32,7 @@ export const create_coindesk_table = async () => {
 }
 
 export const ignore_stablecoins = async (stableCoinList) => {
+  //query to set coindesk_coins_list.IgnoreThis to 1 for coins that are in stableCoinList
   let createSql = "CREATE TEMPORARY TABLE stable_coins_list(CoinSymbol varchar(10), CoinName varchar(50), CONSTRAINT PRIMARY KEY (CoinSymbol, CoinName))";
   let insertSql = 'INSERT INTO stable_coins_list VALUES ?';
   let ignoreStableCoinsSql = "UPDATE coindesk_coins_list INNER JOIN stable_coins_list ON coindesk_coins_list.CoinSymbol = stable_coins_list.CoinSymbol SET IgnoreThis=1"
@@ -52,8 +56,8 @@ export const ignore_stablecoins = async (stableCoinList) => {
     return true;
 }
 
-//Create categories coins list
 export const create_categories_coins_list = async () => {
+    //query to create categories_coins_list
     let sql = "CREATE TABLE IF NOT EXISTS categories_coins_list (CoinSymbol varchar(10), CoinName varchar(50), CoinPapricaID varchar(50), Category varchar(30), CoinRank int, CONSTRAINT PRIMARY KEY (CoinSymbol, CoinName))"
     const connection = await mysql.createConnection
       ({
@@ -69,7 +73,8 @@ export const create_categories_coins_list = async () => {
 
 
 
-  export const create_temporary_tables_for_category = async () => {
+export const create_temporary_tables_for_category = async () => {
+  //더 이상 사용하지 않음
   let sql = "CREATE TEMPORARY TABLE categories_coins_list (CoinSymbol varchar(10), CoinName varchar(50), CoinPapricaID varchar(50), Category varchar(30), CoinRank int, CONSTRAINT PRIMARY KEY (CoinSymbol, CoinName))"
   const connection = await mysql.createConnection
     ({
@@ -84,6 +89,7 @@ export const create_categories_coins_list = async () => {
 }
 
 export const insert_dates = async (tableName, columnName, startDate, endDate) => {
+  // query to insert dates between startDate and endDate in tableName.columnName
   let subSql = 
   "\
     select gen_date from \
@@ -98,7 +104,7 @@ export const insert_dates = async (tableName, columnName, startDate, endDate) =>
   
   let sql = 
   "\
-  insert into `"+tableName+"` (`"+columnName+"`)\
+  insert ignore into `"+tableName+"` (`"+columnName+"`)\
     " + subSql
     try {
       const connection = await mysql.createConnection
@@ -118,6 +124,7 @@ export const insert_dates = async (tableName, columnName, startDate, endDate) =>
 }
 
 export const insert_time_data_hourly = async (categoryName) => {
+  //query to insert Date values for tableName.Date
   const tableName = categoryName + '_prices_hourly';
   try {
       const connection = await mysql.createConnection
@@ -140,7 +147,8 @@ export const insert_time_data_hourly = async (categoryName) => {
 }
 
 export const create_category_history_daily_or_hourly = async (categoryName, dailyOrHourly) => {
-  //Creates category table with date, each coin's price, and isNull to show if price data is null
+  // query to create a category table with date, each coin's prices, and isNull 
+  // isNull shows if the price data is null or not
   let tableName;
   if (dailyOrHourly == "daily") {
     tableName = categoryName + "_prices"
@@ -161,7 +169,7 @@ export const create_category_history_daily_or_hourly = async (categoryName, dail
     database : MY_DATABASE,
   });
 
-  const [categoryCoinsRows, categoryCoinsFields] = await connection.execute(findSymbolOfCategoryCoinsSQL);
+  const [categoryCoinsRows, categoryCoinsFields] = await connection.query(findSymbolOfCategoryCoinsSQL);
   for (let i=0; i<categoryCoinsRows.length; i++) {
     sqlCreate = sqlCreate +", " + categoryCoinsRows[i].CoinSymbol;
     sqlCreate = sqlCreate + " DECIMAL(20, 6) "
@@ -170,14 +178,13 @@ export const create_category_history_daily_or_hourly = async (categoryName, dail
 
   }
   sqlCreate = sqlCreate + ", CONSTRAINT PRIMARY KEY (Date) )"
-  console.log("end query create_category_history_hourly()");
+  console.log("end query create_category_history_daily_or_hourly()");
   await connection.execute(sqlCreate);
   return true
 }
 
 export const insert_category_history_daily = async (categoryName) => { 
-  //This function's goal is to insert the price data and date
-  //for all coins within a category
+  // query to insert prices for all coins in categoryName for the category table tableName
 
   try {
     const connection = await mysql.createConnection
@@ -189,7 +196,7 @@ export const insert_category_history_daily = async (categoryName) => {
     });
     const tableName = categoryName + "_prices";
     const coinsList = await get_coins_specific_category(categoryName);
-    const lastYear = await get_364days_before();
+    const lastYear = get_364days_before();
   
     for (let i=0; i<coinsList.length; i++) { 
       // For all coins in this category, will make a temporary table 
@@ -205,25 +212,42 @@ export const insert_category_history_daily = async (categoryName) => {
             thisDate = thisDate.slice(1, -11);
             priceAndTimeData.push([thisDate, [data[j].price]])
         }
-  
-        const sqlCreateTemp = "CREATE Temporary TABLE `temp_table_daily_"+coinSymbol+"` (date varchar(30), `"+coinSymbol+"` decimal(20, 6) );"
+
+        console.log("priceAndTimeData[0]: ", priceAndTimeData[0]);
+
+        const sqlCreateTemp = "CREATE TEMPORARY TABLE `temp_table_daily_"+coinSymbol+"` (date varchar(30), `"+coinSymbol+"` decimal(20, 6) );"
         const sqlInsertTemp = "Insert into `temp_table_daily_"+coinSymbol+"` (date, `"+coinSymbol+"` ) values ?"
-        await connection.query(sqlCreateTemp)
-        await connection.query(sqlInsertTemp, [priceAndTimeData])
+        try {
+          await connection.query(sqlCreateTemp)
+        } catch (error) {
+          console.error("error caught in insert_category_history_daily when query sqlCreateTemp");
+          console.error(error);
+        }
+
+        try {
+          await connection.query(sqlInsertTemp, [priceAndTimeData])
+        } catch (error) {
+          console.error("error caught in insert_category_history_daily when query sqlInsertTemp");
+          console.error(error);
+        }
+
         const sql =  
             "UPDATE `"+tableName+"` T \
             SET T.`"+coinSymbol+"` = \
                 (SELECT `"+coinSymbol+"` \
                 FROM `temp_table_daily_"+coinSymbol+"` A \
                 WHERE A.Date = T.Date)"
-        const [categoryCoinsRows, categoryCoinsFields] = await connection.query(sql);
-        // toDel
-        // const sqlVer = "select * from `"+tableName+"` LIMIT 1";
-        // const [r, s] = await connection.query(sqlVer);
-        // console.log("r:", r);
+
+        try {
+          const [categoryCoinsRows, categoryCoinsFields] = await connection.query(sql);
+        } catch (error) {
+          console.error("error caught in insert_category_history_daily() working on sql");
+          console.error(error);
+        }
     }
-    console.log("end query insert_category_history_hourly()");  
+    console.log("end query insert_category_history_daily()");  
   } catch (error) {
+    console.error("error caught in insert_category_history_daily()");
     console.error();
     return false
   }
@@ -231,9 +255,8 @@ export const insert_category_history_daily = async (categoryName) => {
 }
 
 export const insert_category_history_hourly = async (categoryName) => { 
-  //This function's goal is to insert the price data and time (column named 'Date')
-  //for all coins within a category
-
+  //query to insert hourly data and coin prices for all coins in {categoryName}_prices_hourly table
+  
   try {
     const connection = await mysql.createConnection
     ({
@@ -263,7 +286,7 @@ export const insert_category_history_hourly = async (categoryName) => {
             priceAndTimeData.push([thisDate, [data[j].price]])
         }
   
-        const sqlCreateTemp = "CREATE Temporary TABLE `temp_table_hourly_"+coinSymbol+"` (date varchar(30), `"+coinSymbol+"` decimal(20, 6) );"
+        const sqlCreateTemp = "CREATE TEMPORARY TABLE `temp_table_hourly_"+coinSymbol+"` (date varchar(30), `"+coinSymbol+"` decimal(20, 6) );"
         const sqlInsertTemp = "Insert into `temp_table_hourly_"+coinSymbol+"` (date, `"+coinSymbol+"` ) values ?"
         await connection.query(sqlCreateTemp)
         await connection.query(sqlInsertTemp, [priceAndTimeData])
@@ -290,9 +313,8 @@ export const insert_category_history_hourly = async (categoryName) => {
 }
 
 export const nullValueCategory = async (categoryName, dailyOrHourly) => {
-  //This function checks if there are any Null values in price values of 
-  //category tables and replace the null values with their previous values.
-  //If the first price is null, replace to the nearest next not null price value
+  // query to check null price values for coins in table tableName
+  // tableName == "daily" if dailyOrHourly == "daily", and tableName == "hourly" if dailyOrHourly == "hourly"
   
   const connection = await mysql.createConnection
   ({
@@ -376,6 +398,11 @@ export const nullValueCategory = async (categoryName, dailyOrHourly) => {
 }
 
 export const create_categories_graph_data_table_daily_or_hourly = async (dailyOrHourly) => {
+  //query that creates Categories_graph_data_daily or Categories_graph_data_hourly
+  //if dailyOrHourly=="daily", creates Categories_graph_data_daily else if dailyOrHourly=="hourly", creates Categories_graph_data_hourly
+  
+  //Categories_graph_data_daily is a table that has the daily graph data to be sent to the client server
+
   let sql; 
   if (dailyOrHourly == "1y" || dailyOrHourly == "1mo") 
     sql ="CREATE TABLE IF NOT EXISTS Categories_graph_data_daily (Date varchar(30)";
@@ -403,8 +430,9 @@ export const create_categories_graph_data_table_daily_or_hourly = async (dailyOr
     return true;
 }
 
-
 export const insert_calculated_prices_daily = async (categoriesWithCoins, dateRange) => {
+  // query to insert daily calculated graph data prices from coins in the category categoriesWithCoins to Categories_graph_data_daily 
+  // this query imports part of the query from sql_to_merge_category()
   const firstCategoryName = categoriesWithCoins[0][0] + "_prices";
   let sql = "insert into Categories_graph_data_daily select DATE_FORMAT(`" + firstCategoryName + "`.date, '%Y-%m-%d') as time ";
   let sqlJoinTableList = "from `" + firstCategoryName + "`";
@@ -417,7 +445,7 @@ export const insert_calculated_prices_daily = async (categoriesWithCoins, dateRa
       sql = sql + sqlToMerge;
   }
   sql = sql + sqlJoinTableList;
-  const today = await getToday();
+  const today = getToday();
   if (dateRange == "1y") {
       sql = sql + " where `"+firstCategoryName+"`.date between DATE_ADD(DATE_ADD('"+ today +"', INTERVAL 1 DAY), INTERVAL -1 YEAR) and '"+ today + "' ";
   } else if (dateRange == "1mo"){
@@ -432,14 +460,14 @@ export const insert_calculated_prices_daily = async (categoriesWithCoins, dateRa
       password: MY_PASSWORD,
       database : MY_DATABASE,
   });
-  const [rows, fields] = await connection.execute(sql);
-  console.log("end query return_calculated_prices_daily()");
   console.log(sql);
-  return rows;
+  const [rows, fields] = await connection.execute(sql);
+  console.log("end query insert_calculated_prices_daily()");
 }
 
 
 const sql_to_merge_category = (tableName, coinList) => {
+  //query to do the calculation for the daily graph data prices 
   let sqlToMerge = ", round( ";
   let categoryNameToReturn = tableName.slice(0, -7)
   const coinNum = coinList.length;
@@ -461,10 +489,10 @@ const sql_to_merge_category = (tableName, coinList) => {
 }
 
 export const insert_calculated_prices_hourly = async (categoriesWithCoins, dateRange) => {
+  // query to insert hourly calculated graph data prices from coins in the category categoriesWithCoins to Categories_graph_data_hourly 
   const firstCategoryName = categoriesWithCoins[0][0] + "_prices_hourly";
-  // CONVERT_TZ(`" + firstCategoryName + "`.date,'+00:00','+09:00')
-  // let sql = "select DATE_FORMAT(`" + firstCategoryName + "`.date, '%d' '%h') as time ";
-  let sql = "insert into Categories_graph_data_hourly select DATE_FORMAT(  CONVERT_TZ(`" + firstCategoryName + "`.date,'+00:00','+09:00') , '%h') as time ";
+  let sql = "insert into Categories_graph_data_hourly select * from ( select `" + firstCategoryName + "`.date as time "; 
+
   let sqlJoinTableList = "from `" + firstCategoryName + "`";
   for (let i=0; i<categoriesWithCoins.length; i++) {
       const categoryTableName = categoriesWithCoins[i][0] + "_prices_hourly"
@@ -477,10 +505,9 @@ export const insert_calculated_prices_hourly = async (categoriesWithCoins, dateR
       sql = sql + sqlJoinTableList;
       const today = getToday();
       const queryUTCNow = "utc_timestamp()";
-      // const queryUTCBefore23 = "DATE_FORMAT(DATE_ADD(utc_timestamp(), INTERVAL -23 HOUR), '%Y-%m-%dT%TZ')"
-      const queryUTCBefore23 = "DATE_FORMAT(DATE_ADD(utc_timestamp(), INTERVAL -50 HOUR), '%Y-%m-%dT%TZ')"
+      const queryUTCBefore23 = "DATE_FORMAT(DATE_ADD(utc_timestamp(), INTERVAL -23 HOUR), '%Y-%m-%dT%TZ')"
   if (dateRange == "1d") {
-      sql = sql + " where `"+firstCategoryName+"`.date between " + queryUTCBefore23 +" and "+ queryUTCNow ;
+    sql = sql + " order by time desc limit 24) t order by time asc "
   } else {
       console.error("invalid date range in insert_calculated_prices_hourly");
       }
@@ -498,10 +525,11 @@ export const insert_calculated_prices_hourly = async (categoriesWithCoins, dateR
 }
 
 const sql_to_merge_category_1d = (tableName, coinList) => {
+  //query to do the calculation for the hourly graph data prices 
   let sqlToMerge = ", round( ";
   let categoryNameToReturn = tableName.slice(0, -14)
   const coinNum = coinList.length;
-  const queryUTCBefore23h = "DATE_FORMAT(DATE_ADD(utc_timestamp(), INTERVAL -50 HOUR), '%Y-%m-%dT%TZ')"
+  const queryUTCBefore23h = "DATE_FORMAT(DATE_ADD(utc_timestamp(), INTERVAL -23 HOUR), '%Y-%m-%dT%TZ')"
 
   for (let i=0; i<coinNum; i++) {
       if (i==0) {
