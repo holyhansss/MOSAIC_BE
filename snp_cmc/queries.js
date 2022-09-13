@@ -1,16 +1,16 @@
 import mysql from 'mysql2/promise';
-import {MY_HOST, MY_USERNAME, MY_PASSWORD, MY_DATABASE} from "../config/database.js";
+import {MY_HOST, MY_USERNAME, MY_PASSWORD, MY_DATABASE2} from "../config/database.js";
 
 //CREATE TABLE; SNPCMC_1d
 
 export const create_SNPCMC_1d = async () => {
-  let sql = "CREATE TABLE SNPCMC_1d ( Time varchar(10), SNP varchar(50), CMC varchar(50))"
+  let sql = "CREATE TABLE snpcmc_1d ( Time varchar(10), SNP varchar(50), CMC varchar(50))"
   const connection = await mysql.createConnection
     ({
         host: MY_HOST,
         user: MY_USERNAME,
         password: MY_PASSWORD,
-        database : MY_DATABASE,
+        database : MY_DATABASE2,
     });
   const [rows, fields] = await connection.execute(sql);
   console.log("end query create_SNPCMC()");
@@ -19,13 +19,13 @@ export const create_SNPCMC_1d = async () => {
 //CREATE TABLE; SNPCMC_1mo
 
 export const create_SNPCMC_1mo = async () => {
-  let sql = "CREATE TABLE SNPCMC_1mo ( Time varchar(10), SNP varchar(50), CMC varchar(50))"
+  let sql = "CREATE TABLE snpcmc_1mo ( Time varchar(10), SNP varchar(50), CMC varchar(50))"
   const connection = await mysql.createConnection
     ({
         host: MY_HOST,
         user: MY_USERNAME,
         password: MY_PASSWORD,
-        database : MY_DATABASE,
+        database : MY_DATABASE2,
     });
   const [rows, fields] = await connection.execute(sql);
   console.log("end query create_SNPCMC()");
@@ -33,13 +33,13 @@ export const create_SNPCMC_1mo = async () => {
 
 //CREATE TABLE; SNPCMC_1y
 export const create_SNPCMC_1y = async () => {
-    let sql = "CREATE TABLE SNPCMC_1y ( Time varchar(10), SNP varchar(50), CMC varchar(50))"
+    let sql = "CREATE TABLE snpcmc_1y ( Time varchar(10), SNP varchar(50), CMC varchar(50))"
     const connection = await mysql.createConnection
       ({
           host: MY_HOST,
           user: MY_USERNAME,
           password: MY_PASSWORD,
-          database : MY_DATABASE,
+          database : MY_DATABASE2,
       });
     const [rows, fields] = await connection.execute(sql);
     console.log("end query create_SNPCMC()");
@@ -54,7 +54,7 @@ export const insert_to_db_table = async (tableName, valuesList) => {
       host: MY_HOST,
       user: MY_USERNAME,
       password: MY_PASSWORD,
-      database : MY_DATABASE,
+      database : MY_DATABASE2,
   });
     const [rows, fields] = await connection.query(sql, [valuesList]);
     console.log("end query insert_to_db_table()");
@@ -69,7 +69,7 @@ export const insert_to_db_table = async (tableName, valuesList) => {
       host: MY_HOST,
       user: MY_USERNAME,
       password: MY_PASSWORD,
-      database : MY_DATABASE,
+      database : MY_DATABASE2,
   });
     const [rows, fields] = await connection.execute(sql);
     console.log("end query select_data()");
@@ -85,7 +85,7 @@ export const insert_to_db_table = async (tableName, valuesList) => {
       host: MY_HOST,
       user: MY_USERNAME,
       password: MY_PASSWORD,
-      database : MY_DATABASE,
+      database : MY_DATABASE2,
   });
     const [rows, fields] = await connection.execute(sql);
     console.log("end query delete_data()");
