@@ -5,6 +5,7 @@ import {create_categories_coins_list} from "../queries/queries_init.js"
 import {getDataFromCoinpaprica} from "../api.js"
 
 export const initializeCategoryDb = async () => {
+  // create category coins table and insert top 50 coins (top 10 coins from each categories)
   try {
     await create_categories_coins_list();    
   } catch (error) {
@@ -26,12 +27,12 @@ export const initializeCategoryDb = async () => {
       ); 
     }
   }
-  insert_to_db_table("categories_coins_list", insert_to_db);
+  await insert_to_db_table("categories_coins_list", insert_to_db);
 }
 
 
 export async function sortCoindeskList  () {
-
+  //sort top 10 coins from all categories according to current ranks
   let coinSectorList =  [
     {sector: 'Currency', list : []},
     {sector: 'Smart Contract Platform', list : []},
