@@ -173,6 +173,7 @@ export const insert_ignore_to_db_table_column = async (tableName, columns, value
       database : MY_DATABASE,
     });
     const [rows, fields] = await connection.query(sql, [valuesList]);
+    console.log(rows);
     console.log("end query insert_ignore_to_db_table_column() for tableName "+tableName);
     return rows;
   }

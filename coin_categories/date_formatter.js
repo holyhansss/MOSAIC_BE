@@ -56,7 +56,7 @@ export const get_364days_before = () => {
 }
 
 
-export const get_prev_hour = () => {
+export const get_N_hours_before = (N) => {
     let year = new Date().getUTCFullYear();
     let month = new Date().getUTCMonth();
     let date = new Date().getUTCDate();
@@ -67,25 +67,11 @@ export const get_prev_hour = () => {
 
     let utc_cur_hour = new Date(Date.UTC(year, month, date, hour, 0, 0));
 
-    let utc_prev_hour = new Date(utc_cur_hour.getTime() - 60 * 60000 ) ;
-    
-    // console.log(utc_cur_hour);
-    // console.log(utc_prev_hour);
-    return(utc_prev_hour)
-}
+    let utc_prev_hour = new Date(utc_cur_hour.getTime() - N * 60 * 60000 ) ;
+    utc_prev_hour = JSON.stringify(utc_prev_hour)
+    utc_prev_hour = utc_prev_hour.slice(1, -1);
+    utc_prev_hour = utc_prev_hour.slice(0,-5) + 'Z';
 
-export const get_23_hour_before = () => {
-    let year = new Date().getUTCFullYear();
-    let month = new Date().getUTCMonth();
-    let date = new Date().getUTCDate();
-    let hour = new Date().getUTCHours();
-    // var hourago = new Date(Date().getUTCHours() - (1000*60*60));
-
-    // let thisDate = new Date(utcDate.getTime() - i * 60 * 60000 ) ;
-
-    let utc_cur_hour = new Date(Date.UTC(year, month, date, hour, 0, 0));
-
-    let utc_prev_hour = new Date(utc_cur_hour.getTime() - 23 * 60 * 60000 ) ;
     
     // console.log(utc_cur_hour);
     // console.log(utc_prev_hour);
@@ -93,5 +79,3 @@ export const get_23_hour_before = () => {
 }
 
 
-// get_prev_hour()
-// console.log(get_23_hour_before())

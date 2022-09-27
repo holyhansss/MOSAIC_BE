@@ -1,8 +1,6 @@
 import {create_categories_graph_data_table_daily_or_hourly, insert_calculated_prices_daily, insert_calculated_prices_hourly, createGraphDataMinMaxYearlyOrMonthlyOrDaily} from "../queries/queries_init.js"
 import {get_coins_specific_category, insert_min_max_1y_1mo_1d} from "../queries/queries.js"
 
-//TODO make create_categories_graph_data_table_daily_or_hourly() and InsertCategoryGraphDataDailyORHourly() for monthly
-
 
 // Categories_graph_data_1y
 export const InitGraphData = async () => {

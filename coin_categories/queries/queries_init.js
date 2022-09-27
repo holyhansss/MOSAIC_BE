@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 import {MY_HOST, MY_USERNAME, MY_PASSWORD, MY_DATABASE} from "../../config/database.js";
 import {getHistoricalData} from "../api.js"
-import {get_364days_before, get_24_hourly_time_list, getYesterdaySecondPlusMin, getToday, get_23_hour_before, getNDaysBefore} from "../date_formatter.js"
+import {get_364days_before, get_24_hourly_time_list, getYesterdaySecondPlusMin, getToday, getNDaysBefore} from "../date_formatter.js"
 import {get_coins_specific_category} from "./queries.js"
 
 //The word 'daily' is similar to the words '1y' and '1mo'
@@ -70,7 +70,6 @@ export const create_categories_coins_list = async () => {
     console.log("end query create_categories_coins_list()");
     return rows;
   }
-
 
 
 export const create_temporary_tables_for_category = async () => {
@@ -461,11 +460,9 @@ export const insert_calculated_prices_daily = async (categoriesWithCoins, dateRa
   sql = sql + sqlJoinTableList;
   const today = getToday();
   if (dateRange == "1y") {
-      // sql = sql + " where `"+firstCategoryName+"`.date between DATE_ADD(DATE_ADD('"+ today +"', INTERVAL 1 DAY), INTERVAL -1 YEAR) and '"+ today + "' ";
       sql = sql + " where `"+firstCategoryName+"`.date between '"+startDate+"' and '"+ today + "' ";
 
   } else if (dateRange == "1mo"){
-      // sql = sql + " where `"+firstCategoryName+"`.date between DATE_ADD('"+ today +"', INTERVAL -1 MONTH) and '"+ today + "' ";
       sql = sql + " where `"+firstCategoryName+"`.date between '"+startDate+"' and '"+ today + "' ";
     } else {
       console.error("invalid date range in return_calculated_prices_daily");
@@ -482,10 +479,6 @@ export const insert_calculated_prices_daily = async (categoriesWithCoins, dateRa
   console.log("end query insert_calculated_prices_daily()");
 }
 
-// console.log(getToday());
-// console.log(getNDaysBefore(1));
-// console.log(get_23_hour_before());
-// console.log( getNDaysBefore(30));
 
 const sql_to_merge_category = (tableName, coinList, dateRange) => {
   //query to do the calculation for the daily graph data prices 
@@ -503,11 +496,8 @@ const sql_to_merge_category = (tableName, coinList, dateRange) => {
 
   for (let i=0; i<coinNum; i++) {
       if (i==0) {
-          // sqlToMerge = sqlToMerge + "IFNULL ((`"+coinList[i]+"` * 100 / (select `"+coinList[i]+"` from `"+tableName+"` LIMIT 0,1) / "+coinNum+"), 0)"; //TODO del
           sqlToMerge = sqlToMerge + "IFNULL ((`"+coinList[i]+"` * 100 / (select `"+coinList[i]+"` from `"+tableName+"` where Date = '"+startDate+"') / "+coinNum+"), 0)";
-
         } else {
-          // sqlToMerge = sqlToMerge + " + IFNULL ((`"+coinList[i]+"` * 100 / (select `"+coinList[i]+"` from `"+tableName+"` LIMIT 0,1) / "+coinNum+"), 0)"; //TODO del
           sqlToMerge = sqlToMerge + " + IFNULL ((`"+coinList[i]+"` * 100 / (select `"+coinList[i]+"` from `"+tableName+"` where Date = '"+ startDate +"') / "+coinNum+"), 0)";
       }
   }
