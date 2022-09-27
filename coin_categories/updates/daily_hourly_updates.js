@@ -1,7 +1,7 @@
 import {get_coins_specific_category, insert_ignore_to_db_table_column} from "../queries/queries.js"
 import {daily_update_to_db_table_column, replaceToLatestValueAndSetIsNull} from "../queries/queries_daily.js"
 import {getHistoricalData} from "../api.js"
-import {getNDaysBefore, getYesterdaySecondPlusMin, get_24_hourly_time_list} from "../date_formatter.js"
+import {getNDaysBefore, getYesterdaySecondPlusMin, get_prev_hour, get_24_hourly_time_list} from "../date_formatter.js"
 
 const categories =  [
     'Currency',
@@ -43,10 +43,31 @@ const hourlyUpdates = async () => {
     for (let i=0; i<categories.length; i++){
         const categoryCoins = await get_coins_specific_category(categories[i])
         const tableName = categories[i] + "_prices_hourly";
-        const start_date = get_24_hourly_time_list()
+        const start_date = get_prev_hour()
         await insert_ignore_to_db_table_column(tableName, ["Date"], start_date);
+        for (let j=0; j<categoryCoins.length; j++){
+            const coinpaprikaID = categoryCoins[j].CoinPapricaID;
+            const coinID = categoryCoins[j].CoinSymbol;
+            const prevHourData = await getHistoricalData(coinpaprikaID, start_date, "1h");
+            const price = prevHourData[0].price;
+            if (price == null) {
+                // if price received from api is null
+                replaceToLatestValueAndSetIsNull(tableName, coinID, start_date);
+            } else {
+                daily_update_to_db_table_column(tableName, coinID, start_date, price)
+            }
+
+
+
+
+        
+        }
 
 
 
     }
 }
+
+
+// curl --request GET \
+// --url 'https://api.coinpaprika.com/v1/tickers/btc-bitcoin/historical?start=2022-09-27T11:00:00Z&interval=1h'
