@@ -32,7 +32,6 @@ export const getHistoricalData = async (coin_id, start_date, time_interval) => {
     };
   
     let result;
-  
     await axios.request(options).then(function (response) {
         result = response.data
     }).catch(function (error) {

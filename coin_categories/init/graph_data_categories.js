@@ -1,16 +1,17 @@
 import {create_categories_graph_data_table_daily_or_hourly, insert_calculated_prices_daily, insert_calculated_prices_hourly, createGraphDataMinMaxYearlyOrMonthlyOrDaily} from "../queries/queries_init.js"
 import {get_coins_specific_category, insert_min_max_1y_1mo_1d} from "../queries/queries.js"
 
-//TODO make create_categories_graph_data_table_daily_or_hourly() and InsertCategoryGraphDataDailyORHourly() for monthly
 
-
+// Categories_graph_data_1y
 export const InitGraphData = async () => {
   // function to initialize tables for graph data table
   try {
       
         await create_categories_graph_data_table_daily_or_hourly("1y"); 
+        await create_categories_graph_data_table_daily_or_hourly("1mo"); 
         await create_categories_graph_data_table_daily_or_hourly("1d");            
         await InsertCategoryGraphDataDailyORHourly("1y");
+        await InsertCategoryGraphDataDailyORHourly("1mo");
         await InsertCategoryGraphDataDailyORHourly("1d");
         await createGraphDataMinMaxYearlyOrMonthlyOrDaily("1y")
         await createGraphDataMinMaxYearlyOrMonthlyOrDaily("1mo")
@@ -46,9 +47,10 @@ export const InsertCategoryGraphDataDailyORHourly = async (dailyOrHourly) => {
               allCategories[i][1].push(thisCategoryCoins[j].CoinSymbol)
             }
         }
-        if (dailyOrHourly == "1y" || dailyOrHourly == "1mo" )
-          //data for 1y and 1mo are the same
+        if (dailyOrHourly == "1y")
           await insert_calculated_prices_daily (allCategories, "1y") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
+        else if (dailyOrHourly == "1mo")
+          await insert_calculated_prices_daily(allCategories, "1mo") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
         else if (dailyOrHourly == "1d")
           await insert_calculated_prices_hourly(allCategories, "1d") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
         else {

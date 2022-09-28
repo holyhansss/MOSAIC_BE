@@ -173,6 +173,7 @@ export const insert_ignore_to_db_table_column = async (tableName, columns, value
       database : MY_DATABASE,
     });
     const [rows, fields] = await connection.query(sql, [valuesList]);
+    console.log(rows);
     console.log("end query insert_ignore_to_db_table_column() for tableName "+tableName);
     return rows;
   }
@@ -226,7 +227,7 @@ export const get_coins_specific_category = async (thisCategory) => {
   }
 
 export const return_calculated_prices = async (categories, dateRange) => {
-    // query to return graph data within dateRange from Categories_graph_data_daily or Categories_graph_data_hourly 
+    // query to return graph data within dateRange from Categories_graph_data_1y, Categories_graph_data_1mo or Categories_graph_data_1d
     // range is 364 days if dateRange == '1y', 30 days if dateRange == '1mo', 23 hours if dateRange == '1d'
     let tableName;
     let startDate;
@@ -234,17 +235,17 @@ export const return_calculated_prices = async (categories, dateRange) => {
     let dateFormat;
 
     if (dateRange == "1y") {
-        tableName = "Categories_graph_data_daily";
+        tableName = "Categories_graph_data_1y";
         startDate = get_364days_before();
         minmaxTable = "min_max_1y"
         dateFormat = "date, '%Y-%m-%d'"
     } else if (dateRange == "1mo"){
-        tableName = "Categories_graph_data_daily";
+        tableName = "Categories_graph_data_1mo";
         startDate = getNDaysBefore(30);
         minmaxTable = "min_max_1mo"
         dateFormat = "date, '%Y-%m-%d'"
     } else if (dateRange == "1d"){
-        tableName = "Categories_graph_data_hourly";
+        tableName = "Categories_graph_data_1d";
         startDate = getYesterdaySecondPlusMin();
         minmaxTable = "min_max_1d"
         dateFormat = "CONVERT_TZ(date,'+00:00','+09:00') , '%h'"
@@ -282,15 +283,15 @@ export const insert_min_max_1y_1mo_1d = async (yearMonthOrDay) => {
     let insertToTable;
     if (yearMonthOrDay=="1y"){
         startDate = get_364days_before();
-        tableName = "Categories_graph_data_daily";
+        tableName = "Categories_graph_data_1y";
         insertToTable = "min_max_1y"
     }else if(yearMonthOrDay=="1mo"){
         startDate = getNDaysBefore(30);
-        tableName = "Categories_graph_data_daily";
+        tableName = "Categories_graph_data_1mo";
         insertToTable = "min_max_1mo"
     }else if(yearMonthOrDay=="1d"){
         startDate = getYesterdaySecondPlusMin();
-        tableName = "Categories_graph_data_hourly";
+        tableName = "Categories_graph_data_1d";
         insertToTable = "min_max_1d"
     }
     let sql = "insert into "+insertToTable+" select floor(MIN(T.price)) as min, ceiling(MAX(T.price)) as max from (select `" + allCategories[0][0] + "` as price, date from " + tableName;
