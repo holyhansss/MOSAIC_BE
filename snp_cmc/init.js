@@ -6,6 +6,7 @@ export const init_snpcmc = async () => {
     await create_SNPCMC_1mo();
     await create_SNPCMC_1y();
 
+
     let update_data_1d=[];
     let data_1d=[];
     data_1d=await getData1d();
@@ -46,3 +47,4 @@ export const init_snpcmc = async () => {
 }
 
 //init_snpcmc()
+
