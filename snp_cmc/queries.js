@@ -73,7 +73,7 @@ export const insert_to_db_table = async (tableName, valuesList) => {
   });
     const [rows, fields] = await connection.execute(sql);
     console.log("end query select_data()");
-    console.log("rows: ", rows);
+    //console.log("rows: ", rows);
     return rows;
   }
 
