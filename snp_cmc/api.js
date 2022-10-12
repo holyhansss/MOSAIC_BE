@@ -275,5 +275,5 @@ export const getData1d = async () => {
 };
 
 // getData1d()
-getData1mo();
-getData1y();
+// getData1mo();
+// getData1y();
