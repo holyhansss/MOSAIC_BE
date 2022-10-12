@@ -56,7 +56,6 @@ export const control_queries_1y = async () => {
 export const get_snpcmc_data_1d = async (req, res) => {
     let data_1d=[]
     try {    
-        
          data_1d = await select_data("snpcmc_1d") //쿼리 선택 후 불러오기
          console.log("try succeeded");
          res.send(data_1d);
@@ -70,7 +69,6 @@ export const get_snpcmc_data_1d = async (req, res) => {
 export const get_snpcmc_data_1mo = async (req, res) => {
     let data_1mo=[]
     try {    
-        
          data_1mo = await select_data("snpcmc_1mo") //쿼리 선택 후 불러오기
          console.log("try succeeded select");
          res.send(data_1mo);
