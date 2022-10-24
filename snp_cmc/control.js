@@ -68,6 +68,7 @@ export const get_snpcmc_data_1d = async (req, res) => {
 //1개월 SNPCMC 데이터 불러오는 함수
 export const get_snpcmc_data_1mo = async (req, res) => {
     let data_1mo=[]
+    update_queries_1mo();
     try {    
          data_1mo = await select_data("snpcmc_1mo") //쿼리 선택 후 불러오기
          console.log("try succeeded select");
@@ -80,6 +81,7 @@ export const get_snpcmc_data_1mo = async (req, res) => {
 //1년 SNPCMC 데이터 불러오는 함수
 export const get_snpcmc_data_1yr = async (req, res) => {
     let data_1yr=[]
+    update_queries_1yr();
     try {
         
          data_1yr = await select_data("snpcmc_1y") //쿼리 선택 후 불러오기
@@ -108,9 +110,9 @@ export const update_queries_1yr = async (req, res) => {
         console.log(error);
         res.json({ message: error.message });        
     }
-
+    
     now_timestamp= (Date.now() / 1000) | 0; 
-    value= Math.abs(last.time-now_timestamp );
+    value= Math.abs(last.Time-now_timestamp );
 
 
     if (value>=86400){
@@ -120,13 +122,13 @@ export const update_queries_1yr = async (req, res) => {
         data_1y=await getData1y(); //API 데이터 불러오기
         for (let i=0; i<data_1y.length; i++){
             update_data_1y.push([
-                data_1y[i].Time,
+                data_1y[i].time,
                 data_1y[i].SnP,
                 data_1y[i].CMC]
             )
         }
         await insert_to_db_table("SNPCMC_1y",update_data_1y); //쿼리에 데이터 넣기
-
+        console.log("Update snpcmc 1yr")
     }else if (value<86400){
         console.log("No Update")
     }

@@ -46,5 +46,5 @@ export const init_snpcmc = async () => {
     console.log("try succeeded init 1yr data snp_cmc");
 }
 
-//init_snpcmc()
+init_snpcmc()
 

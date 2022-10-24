@@ -64,4 +64,4 @@ const hourlyUpdates = async () => {
 }
 
 // hourlyUpdates()
-// dailyUpdates()
+dailyUpdates()
