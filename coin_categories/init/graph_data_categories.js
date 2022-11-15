@@ -9,16 +9,20 @@ export const InitGraphData = async () => {
       
         await create_categories_graph_data_table_daily_or_hourly("1y"); 
         await create_categories_graph_data_table_daily_or_hourly("1mo"); 
-        await create_categories_graph_data_table_daily_or_hourly("1d");            
+        await create_categories_graph_data_table_daily_or_hourly("6mo"); 
+        // await create_categories_graph_data_table_daily_or_hourly("1d");            
         await InsertCategoryGraphDataDailyORHourly("1y");
         await InsertCategoryGraphDataDailyORHourly("1mo");
-        await InsertCategoryGraphDataDailyORHourly("1d");
+        await InsertCategoryGraphDataDailyORHourly("6mo");
+        // await InsertCategoryGraphDataDailyORHourly("1d");
         await createGraphDataMinMaxYearlyOrMonthlyOrDaily("1y")
         await createGraphDataMinMaxYearlyOrMonthlyOrDaily("1mo")
-        await createGraphDataMinMaxYearlyOrMonthlyOrDaily("1d")
+        await createGraphDataMinMaxYearlyOrMonthlyOrDaily("6mo")
+        // await createGraphDataMinMaxYearlyOrMonthlyOrDaily("1d")
         insert_min_max_1y_1mo_1d("1y")
         insert_min_max_1y_1mo_1d("1mo")
-        insert_min_max_1y_1mo_1d("1d")
+        insert_min_max_1y_1mo_1d("6mo")
+        // insert_min_max_1y_1mo_1d("1d")
     } catch (error) {
         console.error(error);
         console.error("initGraphData Failed");
@@ -49,6 +53,8 @@ export const InsertCategoryGraphDataDailyORHourly = async (dailyOrHourly) => {
         }
         if (dailyOrHourly == "1y")
           await insert_calculated_prices_daily (allCategories, "1y") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
+        else if (dailyOrHourly == "6mo")
+          await insert_calculated_prices_daily(allCategories, "6mo") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
         else if (dailyOrHourly == "1mo")
           await insert_calculated_prices_daily(allCategories, "1mo") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
         else if (dailyOrHourly == "1d")

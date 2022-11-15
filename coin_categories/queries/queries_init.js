@@ -407,8 +407,10 @@ export const create_categories_graph_data_table_daily_or_hourly = async (dailyOr
     sql ="CREATE TABLE IF NOT EXISTS Categories_graph_data_1y (Date varchar(30)";
   else if (dailyOrHourly == "1mo")
     sql ="CREATE TABLE IF NOT EXISTS Categories_graph_data_1mo (Date varchar(30)";
-  else if (dailyOrHourly == "1d")
-  sql ="CREATE TABLE IF NOT EXISTS Categories_graph_data_1d (Date varchar(30)";
+  else if (dailyOrHourly == "6mo")
+  sql ="CREATE TABLE IF NOT EXISTS Categories_graph_data_6mo (Date varchar(30)";
+  // else if (dailyOrHourly == "1d")
+  // sql ="CREATE TABLE IF NOT EXISTS Categories_graph_data_1d (Date varchar(30)";
   
   for (let i=0; i<allCategories.length; i++) {
     sql = sql + ", `" + allCategories[i] + "` decimal(20,6)"
@@ -436,17 +438,19 @@ export const insert_calculated_prices_daily = async (categoriesWithCoins, dateRa
   // this query imports part of the query from sql_to_merge_category()
   const firstCategoryName = categoriesWithCoins[0][0] + "_prices";
   let tableName;
-
-
   let startDate;
     if (dateRange == '1y'){
       startDate = get_364days_before()
       tableName = "Categories_graph_data_1y"
+  } else if (dateRange == '6mo'){
+    startDate = getNDaysBefore(180)
+    tableName = "Categories_graph_data_6mo"
   }
   else if (dateRange == '1mo'){
     startDate = getNDaysBefore(30)
     tableName = "Categories_graph_data_1mo"
-  }
+  } 
+
   let sql = "insert into " + tableName + " select DATE_FORMAT(`" + firstCategoryName + "`.date, '%Y-%m-%d') as time ";
   let sqlJoinTableList = "from `" + firstCategoryName + "`";
   for (let i=0; i<categoriesWithCoins.length; i++) {
@@ -461,10 +465,13 @@ export const insert_calculated_prices_daily = async (categoriesWithCoins, dateRa
   const today = getToday();
   if (dateRange == "1y") {
       sql = sql + " where `"+firstCategoryName+"`.date between '"+startDate+"' and '"+ today + "' ";
-
-  } else if (dateRange == "1mo"){
+  } else if (dateRange == "6mo"){
       sql = sql + " where `"+firstCategoryName+"`.date between '"+startDate+"' and '"+ today + "' ";
-    } else {
+  }
+  else if (dateRange == "1mo"){
+      sql = sql + " where `"+firstCategoryName+"`.date between '"+startDate+"' and '"+ today + "' ";
+    }
+     else {
       console.error("invalid date range in return_calculated_prices_daily");
   }
   const connection = await mysql.createConnection
@@ -490,6 +497,8 @@ const sql_to_merge_category = (tableName, coinList, dateRange) => {
   if (dateRange=="1y")
     startDate = get_364days_before()
     // startDate = "DATE_ADD(DATE_ADD('"+ today +"', INTERVAL 1 DAY), INTERVAL -1 YEAR)"
+  else if (dateRange=="6mo")
+    startDate = getNDaysBefore(180)
   else if (dateRange=="1mo")
     startDate = getNDaysBefore(30)
     // startDate = "DATE_ADD('"+ today +"', INTERVAL -1 MONTH)"
@@ -561,10 +570,12 @@ export const createGraphDataMinMaxYearlyOrMonthlyOrDaily = async (yearlyOrMonthl
   let sql ;
   if (yearlyOrMonthlyOrDaily == "1y")
     sql = "create table min_max_1y (min decimal(20,6), max decimal(20,6))";
-  else if  (yearlyOrMonthlyOrDaily == "1mo")
+  else if (yearlyOrMonthlyOrDaily == "1mo")
     sql = "create table min_max_1mo (min decimal(20,6), max decimal(20,6))";
-  else if  (yearlyOrMonthlyOrDaily == "1d")
-    sql = "create table min_max_1d (min decimal(20,6), max decimal(20,6))";
+  else if (yearlyOrMonthlyOrDaily == "6mo")
+    sql = "create table min_max_6mo (min decimal(20,6), max decimal(20,6))";
+  // else if  (yearlyOrMonthlyOrDaily == "1d")
+  //   sql = "create table min_max_1d (min decimal(20,6), max decimal(20,6))";
   else 
     console.error("invalid yearlyOrMonthlyOrDaily value in createGraphDataMinMaxYearlyOrMonthlyOrDaily()");
 

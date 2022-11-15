@@ -13,38 +13,38 @@ const allCategories =
 ]
 
 
-export const get_category_data_1d = async (req, res) => {
-    //This function returns 1d graph data to the client server
-    console.log("Categories to show 1y:", req.query.categoryArray);
-    const categoriesToShowArray = req.query.categoryArray; 
-    console.log("categoriesToShowArray 1y: ", categoriesToShowArray);
+// export const get_category_data_1d = async (req, res) => {
+//     //This function returns 1d graph data to the client server
+//     console.log("Categories to show 1y:", req.query.categoryArray);
+//     const categoriesToShowArray = req.query.categoryArray; 
+//     console.log("categoriesToShowArray 1y: ", categoriesToShowArray);
 
-    let categories = [];
-    for (let i=0; i<allCategories.length; i++) {
-        if (categoriesToShowArray[i] == 'false')
-            continue;
-        categories.push(allCategories[i])
-    }
+//     let categories = [];
+//     for (let i=0; i<allCategories.length; i++) {
+//         if (categoriesToShowArray[i] == 'false')
+//             continue;
+//         categories.push(allCategories[i])
+//     }
 
-    try {
-        for (let i=0; i<categories.length; i++){
-            const thisCategoryCoins = await get_coins_specific_category(categories[i][0]); 
-            //카테고리 해당되는 코인들 삽입
-            for (let j=0; j<thisCategoryCoins.length; j++) {
-                categories[i][1].push(thisCategoryCoins[j].CoinSymbol)
-            }
-        }
-        let responseToSend = [];
-         const datesAndPrices = await return_calculated_prices(categories, "1d") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
-         const minMax = await get_min_max_1y_1mo_1d("1d")
-         responseToSend.push(datesAndPrices)
-         responseToSend.push(minMax)
-         res.send(responseToSend);
-    } catch (error) {
-        console.log(error);
-        res.json({ message: error.message });        
-    }
-}
+//     try {
+//         for (let i=0; i<categories.length; i++){
+//             const thisCategoryCoins = await get_coins_specific_category(categories[i][0]); 
+//             //카테고리 해당되는 코인들 삽입
+//             for (let j=0; j<thisCategoryCoins.length; j++) {
+//                 categories[i][1].push(thisCategoryCoins[j].CoinSymbol)
+//             }
+//         }
+//         let responseToSend = [];
+//          const datesAndPrices = await return_calculated_prices(categories, "1d") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
+//          const minMax = await get_min_max_1y_1mo_1d("1d")
+//          responseToSend.push(datesAndPrices)
+//          responseToSend.push(minMax)
+//          res.send(responseToSend);
+//     } catch (error) {
+//         console.log(error);
+//         res.json({ message: error.message });        
+//     }
+// }
 
 export const get_category_data_1mo = async (req, res) => {
     //This function returns 1mo graph data to the client server
@@ -70,6 +70,39 @@ export const get_category_data_1mo = async (req, res) => {
         let responseToSend = [];
          const datesAndPrices = await return_calculated_prices(categories, "1mo") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
          const minMax = await get_min_max_1y_1mo_1d("1mo")
+         responseToSend.push(datesAndPrices)
+         responseToSend.push(minMax)
+         res.send(responseToSend);
+    } catch (error) {
+        console.log(error);
+        res.json({ message: error.message });        
+    }
+}
+
+export const get_category_data_6mo = async (req, res) => {
+    //This function returns 1mo graph data to the client server
+    console.log("Categories to show 6mo:", req.query.categoryArray);
+    const categoriesToShowArray = req.query.categoryArray; 
+    console.log("categoriesToShowArray 6mo: ", categoriesToShowArray);
+
+    let categories = [];
+    for (let i=0; i<allCategories.length; i++) {
+        if (categoriesToShowArray[i] == 'false')
+            continue;
+        categories.push(allCategories[i])
+    }
+
+    try {
+        for (let i=0; i<categories.length; i++){
+            const thisCategoryCoins = await get_coins_specific_category(categories[i][0]);
+            for (let j=0; j<thisCategoryCoins.length; j++) { 
+                //카테고리 해당되는 코인들 삽입
+                categories[i][1].push(thisCategoryCoins[j].CoinSymbol)
+            }
+        }
+        let responseToSend = [];
+         const datesAndPrices = await return_calculated_prices(categories, "6mo") //계산된 가격 코인 별 불러오기 (기준 100으로 맞춤)
+         const minMax = await get_min_max_1y_1mo_1d("6mo")
          responseToSend.push(datesAndPrices)
          responseToSend.push(minMax)
          res.send(responseToSend);
@@ -244,12 +277,19 @@ export const return_calculated_prices = async (categories, dateRange) => {
         startDate = getNDaysBefore(30);
         minmaxTable = "min_max_1mo"
         dateFormat = "date, '%Y-%m-%d'"
-    } else if (dateRange == "1d"){
-        tableName = "Categories_graph_data_1d";
-        startDate = getYesterdaySecondPlusMin();
-        minmaxTable = "min_max_1d"
-        dateFormat = "CONVERT_TZ(date,'+00:00','+09:00') , '%h'"
-    } else {
+    } else if (dateRange == "6mo"){
+        tableName = "Categories_graph_data_6mo";
+        startDate = getNDaysBefore(180);
+        minmaxTable = "min_max_6mo"
+        dateFormat = "date, '%Y-%m-%d'"
+    } 
+    // else if (dateRange == "1d"){
+    //     tableName = "Categories_graph_data_1d";
+    //     startDate = getYesterdaySecondPlusMin();
+    //     minmaxTable = "min_max_1d"
+    //     dateFormat = "CONVERT_TZ(date,'+00:00','+09:00') , '%h'"
+    // } 
+    else {
         console.error("Invalid dateRange in return_calculated_prices");
         return false;
     }
@@ -258,6 +298,7 @@ export const return_calculated_prices = async (categories, dateRange) => {
     for (let i=0; i<categories.length; i++) {
         sql = sql + ", `" + categories[i][0] + "`";
     }
+    
     sql = sql + "from " + tableName;
     sql = sql + " where date > '"+startDate+"'"
     const today = await getToday();
@@ -285,15 +326,20 @@ export const insert_min_max_1y_1mo_1d = async (yearMonthOrDay) => {
         startDate = get_364days_before();
         tableName = "Categories_graph_data_1y";
         insertToTable = "min_max_1y"
-    }else if(yearMonthOrDay=="1mo"){
+    } else if(yearMonthOrDay=="6mo"){
+        startDate = getNDaysBefore(180);
+        tableName = "Categories_graph_data_6mo";
+        insertToTable = "min_max_6mo"
+    } else if(yearMonthOrDay=="1mo"){
         startDate = getNDaysBefore(30);
         tableName = "Categories_graph_data_1mo";
         insertToTable = "min_max_1mo"
-    }else if(yearMonthOrDay=="1d"){
-        startDate = getYesterdaySecondPlusMin();
-        tableName = "Categories_graph_data_1d";
-        insertToTable = "min_max_1d"
     }
+    // else if(yearMonthOrDay=="1d"){
+    //     startDate = getYesterdaySecondPlusMin();
+    //     tableName = "Categories_graph_data_1d";
+    //     insertToTable = "min_max_1d"
+    // }
     let sql = "insert into "+insertToTable+" select floor(MIN(T.price)) as min, ceiling(MAX(T.price)) as max from (select `" + allCategories[0][0] + "` as price, date from " + tableName;
     for (let i=1; i<allCategories.length; i++) {
         sql = sql + " union all select `" + allCategories[i][0] + "` as price, date from " +tableName ;
@@ -320,9 +366,14 @@ export const get_min_max_1y_1mo_1d = async (yearMonthOrDay) => {
         sql = "select * from min_max_1y"
     }else if(yearMonthOrDay=="1mo"){
         sql = "select * from min_max_1mo"
-    }else if(yearMonthOrDay=="1d"){
-        sql = "select * from min_max_1d"
+    }else if(yearMonthOrDay=="6mo"){
+        sql = "select * from min_max_6mo"
     }
+
+    
+    // else if(yearMonthOrDay=="1d"){
+    //     sql = "select * from min_max_1d"
+    // }
     const connection = await mysql.createConnection
     ({
         host: MY_HOST,
