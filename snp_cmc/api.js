@@ -100,7 +100,7 @@ let CMCOptions_1mo = {
 
 var SNPOptions_1y = {
   method: "GET",
-  url: "https://yfapi.net/v8/finance/chart/^GSPC?comparisons=MSFT%2C%5EVIX&range=1y&region=US&interval=1d&lang=en&events=div%2Csplit",
+  url: "https://yfapi.net/v8/finance/chart/^GSPC?comparisons=MSFT%2C%5EVIX&range=1y&region=US&interval=1m&lang=en&events=div%2Csplit",
 
   params: {
     modules: "defaultKeyStatistics,assetProfile",
@@ -111,7 +111,7 @@ var SNPOptions_1y = {
 };
 var CMCOptions_1y = {
   method: "GET",
-  url: "https://yfapi.net/v8/finance/chart/^CMC200?comparisons=MSFT%2C%5EVIX&range=1y&region=US&interval=1d&lang=en&events=div%2Csplit",
+  url: "https://yfapi.net/v8/finance/chart/^CMC200?comparisons=MSFT%2C%5EVIX&range=1y&region=US&interval=1m&lang=en&events=div%2Csplit",
 
   params: {
     modules: "defaultKeyStatistics,assetProfile",
@@ -152,7 +152,7 @@ export const getData1mo = async () => {
   console.log(data1);
   console.log(data2);
 
-  for (let i = 0; i < data1.length; i++) {
+  for (let i = 0; i < data2.length; i++) {
     resTemp.push({
       time: data1[i].time,
       SnP: data1[i].SnP,
@@ -171,7 +171,7 @@ export const getData1y = async () => {
   console.log(data1);
   console.log(data2);
 
-  for (let i = 0; i < data1.length; i++) {
+  for (let i = 0; i < data2.length; i++) {
     resTemp.push({
       time: data1[i].time,
       SnP: data1[i].SnP,
@@ -223,7 +223,7 @@ async function getCMC_1d(datacall) {
     const IndexData2 = res.data.chart.result[0].indicators.quote[0].close.map(
       (data, index) =>
         data && {
-          time: res.data.chart.result[0].timestamp[index] + 32400,
+          time: res.data.chart.result[0].timestamp[index] + 60,
           CMC: data,
         }
     );
@@ -260,9 +260,9 @@ export const getData1d = async () => {
   const data1 = await getSNP_1d(SNPOptions_1d);
   const data2 = await getCMC_1d(CMCOptions_1d);
   //console.log(data1);
-  //console.log(data2);
+  console.log(data2);
 
-  for (let i = 0; i < data1.length; i++) {
+  for (let i = 0; i < data2.length; i++) {
     resTemp.push({
       time: data1[i].time,
       SnP: data1[i].SnP,
@@ -274,6 +274,6 @@ export const getData1d = async () => {
   return resTemp;
 };
 
-// getData1d()
-// getData1mo();
+//getData1d()
+//getData1mo();
 // getData1y();
